@@ -1,0 +1,46 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <h1>Verify your email</h1>
+        <p class="text-muted">We emailed you a 6-digit code. Enter it below to verify your account.</p>
+
+        <form action="/verify-email" method="POST">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                name="email"
+                id="email"
+                type="email"
+                class="form-control"
+                value="<%= prefillEmail %>"
+                required
+                />
+            </div>
+            <div class="mb-3">
+                <label for="otp" class="form-label">6-digit code</label>
+                <input
+                name="otp"
+                id="otp"
+                type="text"
+                maxlength="6"
+                pattern="[0-9]{6}"
+                class="form-control text-center"
+                style="letter-spacing: 0.5rem; font-size: 1.4rem;"
+                required
+                autofocus
+                />
+            </div>
+            <button type="submit" class="btn btn-brand w-100">Verify</button>
+        </form>
+
+        <form action="/resend-verification" method="POST" class="mt-2">
+            <input type="hidden" name="email" value="<%= prefillEmail %>" />
+            <button type="submit" class="btn btn-brand-outline w-100">Resend Code</button>
+        </form>
+
+        <p class="text-center mt-3 mb-0">
+            <a href="/login" style="color: var(--brand); font-weight: 600;">Back to Login</a>
+        </p>
+    </div>
+</div>

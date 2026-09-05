@@ -1,0 +1,635 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+    :root {
+        --sp-brand: #fe424d;
+        --sp-brand-dark: #e63946;
+        --sp-brand-soft: #fff1f1;
+        --sp-text: #222222;
+        --sp-muted: #6a6a6a;
+        --sp-border: #e4e4e4;
+        --sp-radius: 1rem;
+        --sp-radius-sm: 0.75rem;
+        --sp-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        --sp-shadow-lg: 0 12px 24px rgba(0,0,0,0.14);
+    }
+
+    .sp-header {
+        margin-bottom: 1rem;
+    }
+
+    .sp-title {
+        font-size: clamp(1.6rem, 4vw, 2.4rem);
+        font-weight: 800;
+        color: var(--sp-text);
+        letter-spacing: -0.02rem;
+        line-height: 1.2;
+        margin-bottom: 0.4rem;
+    }
+
+    .sp-subinfo {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--sp-muted);
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .sp-subinfo i {
+        color: var(--sp-brand);
+    }
+
+    .sp-img-wrapper {
+        border-radius: var(--sp-radius);
+        overflow: hidden;
+        box-shadow: var(--sp-shadow-lg);
+        margin-bottom: 1.5rem;
+    }
+
+    .sp-img {
+        width: 100%;
+        height: 45vh;
+        min-height: 280px;
+        max-height: 480px;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+
+    .sp-img-wrapper:hover .sp-img {
+        transform: scale(1.02);
+    }
+
+    .sp-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 1.5rem 0;
+        border-top: 1px solid var(--sp-border);
+        border-bottom: 1px solid var(--sp-border);
+        margin-bottom: 1.5rem;
+    }
+
+    .sp-owner-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        color: var(--sp-muted);
+        margin-bottom: 1rem;
+    }
+
+    .sp-divider {
+        border-top: 1px solid var(--sp-border);
+        margin: 1.25rem 0;
+    }
+
+    .sp-description {
+        color: var(--sp-text);
+        line-height: 1.6;
+    }
+
+    .sp-price {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--sp-text);
+    }
+
+    .sp-price span {
+        font-weight: 400;
+        font-size: 1rem;
+        color: var(--sp-muted);
+    }
+
+    .sp-category {
+        color: var(--sp-muted);
+    }
+
+    .sp-amenities {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    .sp-amenity-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background-color: #f7f7f7;
+        color: var(--sp-text);
+        padding: 0.4rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+    }
+
+    .sp-amenity-chip i {
+        color: var(--sp-brand);
+        font-size: 0.8rem;
+    }
+
+    .sp-btns {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+
+    .sp-btn-brand,
+    .sp-btn-brand:visited {
+        background-color: var(--sp-brand) !important;
+        border: none !important;
+        color: #fff !important;
+        border-radius: 999px;
+        font-weight: 600;
+        padding: 0.55rem 1.5rem;
+        transition: background-color 0.15s ease, transform 0.1s ease;
+    }
+
+    .sp-btn-brand:hover {
+        background-color: var(--sp-brand-dark) !important;
+        color: #fff !important;
+        transform: translateY(-1px);
+    }
+
+    .sp-btn-outline,
+    .sp-btn-outline:visited {
+        background-color: transparent !important;
+        border: 1.5px solid var(--sp-brand) !important;
+        color: var(--sp-brand) !important;
+        border-radius: 999px;
+        font-weight: 600;
+        padding: 0.55rem 1.5rem;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .sp-btn-outline:hover {
+        background-color: var(--sp-brand) !important;
+        color: #fff !important;
+    }
+
+    .sp-btn-dark-outline,
+    .sp-btn-dark-outline:visited {
+        background-color: transparent !important;
+        border: 1.5px solid var(--sp-text) !important;
+        color: var(--sp-text) !important;
+        border-radius: 999px;
+        font-weight: 600;
+        padding: 0.55rem 1.5rem;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .sp-btn-dark-outline:hover {
+        background-color: var(--sp-text) !important;
+        color: #fff !important;
+    }
+
+    .sp-section-title {
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .sp-form-control {
+        border-radius: var(--sp-radius-sm);
+        border: 1px solid var(--sp-border);
+        padding: 0.6rem 0.9rem;
+        width: 100%;
+    }
+
+    .sp-form-control:focus {
+        outline: none;
+        border-color: var(--sp-brand);
+        box-shadow: 0 0 0 0.2rem var(--sp-brand-soft);
+    }
+
+    .sp-review-card {
+        border: none !important;
+        background-color: #f7f7f7;
+        border-radius: var(--sp-radius-sm) !important;
+        padding: 1rem;
+        height: 100%;
+    }
+
+    .sp-map {
+        height: 380px;
+        width: 100%;
+        border-radius: var(--sp-radius);
+        overflow: hidden;
+        box-shadow: var(--sp-shadow);
+    }
+
+    .sp-booking-widget {
+        border: 1px solid var(--sp-border) !important;
+        border-radius: var(--sp-radius) !important;
+        box-shadow: var(--sp-shadow-lg);
+        padding: 1.5rem !important;
+        background: #fff;
+    }
+
+    @media (min-width: 992px) {
+        .sp-booking-widget {
+            position: sticky;
+            top: 6.5rem;
+        }
+    }
+
+    .sp-booking-widget h4 {
+        font-weight: 700;
+    }
+
+    .sp-price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: var(--sp-muted);
+    }
+
+    .sp-price-total {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--sp-text);
+    }
+
+    .sp-status-badge {
+        border-radius: 999px;
+        padding: 0.3rem 0.8rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+    }
+
+    @media (max-width: 767.98px) {
+        .sp-img {
+            height: 260px;
+        }
+    }
+</style>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    const mapToken = "<%= process.env.MAP_TOKEN %>";
+    const listing = <%- JSON.stringify(listing) %>;
+    const bookedRanges = <%- JSON.stringify(bookings) %>;
+    <% if (currUser) { %>
+    const razorpayUserName = <%- JSON.stringify(currUser.username) %>;
+    const razorpayUserEmail = <%- JSON.stringify(currUser.email) %>;
+    <% } %>
+</script>
+
+<div class="row mt-4">
+    <div class="col-12 col-lg-8">
+
+        <div class="sp-header">
+            <h1 class="sp-title"><%= listing.title %></h1>
+            <p class="sp-subinfo">
+                <i class="fa-solid fa-location-dot"></i>
+                <%= listing.location %>, <%= listing.country %>
+            </p>
+        </div>
+
+        <div class="sp-img-wrapper">
+            <img
+              src="<%= listing.image.url %>"
+              class="sp-img"
+              alt="Listing Image"
+            />
+        </div>
+
+        <div class="sp-card">
+            <p class="sp-owner-chip">
+                <i class="fa-solid fa-user-circle"></i>
+                Hosted by <b>&nbsp;<%= listing.owner.username %></b>
+            </p>
+
+            <div class="sp-divider"></div>
+
+            <p class="sp-description"><%= listing.description %></p>
+
+            <div class="sp-divider"></div>
+
+            <p class="sp-price">
+                &#8377;<%= listing.price.toLocaleString("en-IN") %>
+                <span>/ night</span>
+            </p>
+            <p class="sp-category"><b>Category:</b> <%= listing.category %></p>
+            <p class="sp-category"><b>Max Guests:</b> <%= listing.maxGuests %></p>
+
+            <div class="sp-divider"></div>
+
+            <h6 class="sp-section-title" style="margin-bottom: 0.75rem;">What this place offers</h6>
+            <div class="sp-amenities">
+                <% listing.amenities.forEach(function(item) { %>
+                    <span class="sp-amenity-chip"><i class="fa-solid fa-circle-check"></i> <%= item %></span>
+                <% }) %>
+            </div>
+        </div>
+
+        <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
+        <div class="sp-btns">
+            <a href="/listings/<%= listing._id %>/edit" class="sp-btn-brand">Edit Listing</a>
+            <a href="/listings/<%= listing._id %>/reservations" class="sp-btn-outline">View Reservations</a>
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+                <button class="sp-btn-dark-outline">Delete</button>
+            </form>
+        </div>
+        <% } %>
+
+        <div class="mb-4">
+            <% if(currUser) {%>
+                <h4 class="sp-section-title">Leave a review</h4>
+            <form
+            action="/listings/<%= listing.id %>/reviews"
+            method="POST"
+            novalidate
+            class="needs-validation"
+            >
+                <div class="mb-3 mt-3">
+                <label for="rating" class="form-label">Rating</label>
+                <fieldset class="starability-slot">
+                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                <label for="first-rate1" title="Terrible">1 star</label>
+                <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                <label for="first-rate2" title="Not good">2 stars</label>
+                <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                <label for="first-rate3" title="Average">3 stars</label>
+                <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                <label for="first-rate4" title="Very good">4 stars</label>
+                <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                <label for="first-rate5" title="Amazing">5 stars</label>
+                </fieldset>
+                </div>
+                <div class="mb-3">
+                    <label for="comment" class="form-label">Comments</label>
+                    <textarea
+                    name="review[comment]"
+                    id="comment"
+                    cols="30"
+                    rows="4"
+                    class="sp-form-control"
+                    required
+                    ></textarea>
+                    <div class="invalid-feedback">Please add some comment for review</div>
+                </div>
+                <button class="sp-btn-outline">Submit</button>
+            </form>
+            <div class="sp-divider"></div>
+            <% } %>
+
+            <% if(listing.reviews.length > 0) { %>
+            <h5 class="sp-section-title">All Reviews</h5>
+            <div class="row g-3">
+            <% for(review of listing.reviews) { %>
+            <div class="col-12 col-md-6">
+                <div class="sp-review-card">
+                    <h6 class="mb-1">@<%= review.author.username %></h6>
+                    <p class="starability-result" data-rating="<%= review.rating %>"></p>
+                    <p class="mb-2"><%= review.comment %></p>
+                <% if (currUser && review.author._id.equals(currUser._id)) { %>
+                <form
+                method="POST"
+                action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE"
+                >
+                    <button class="sp-btn-dark-outline" style="padding: 0.3rem 1rem; font-size: 0.85rem;">Delete</button>
+                </form>
+                <% } %>
+                </div>
+            </div>
+            <% } %>
+            </div>
+            <% } %>
+        </div>
+
+        <div class="mb-5">
+            <h4 class="sp-section-title">Where you'll be</h4>
+            <div id="map" class="sp-map"></div>
+        </div>
+
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <% if(currUser) { %>
+        <div id="booking" class="sp-booking-widget mb-4">
+            <h4>Book your stay</h4>
+            <p id="bookingError" class="text-danger d-none small mb-2"></p>
+            <form
+                novalidate
+                class="needs-validation"
+                id="bookingForm"
+            >
+                <div class="mb-3 mt-2">
+                    <label for="checkIn" class="form-label">Check-in</label>
+                    <input type="date" name="booking[checkIn]" id="checkIn" class="sp-form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="checkOut" class="form-label">Check-out</label>
+                    <input type="date" name="booking[checkOut]" id="checkOut" class="sp-form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label for="guests" class="form-label">Guests (max <%= listing.maxGuests %>)</label>
+                    <input type="number" name="booking[guests]" id="guests" class="sp-form-control" min="1" max="<%= listing.maxGuests %>" value="1" required />
+                </div>
+
+                <div id="priceBreakdown" class="d-none mb-3">
+                    <div class="sp-divider"></div>
+                    <p class="sp-price-row">
+                        <span id="nightsLabel"></span>
+                        <span id="subtotalAmt"></span>
+                    </p>
+                    <p class="sp-price-row">
+                        <span>Service fee</span>
+                        <span id="feeAmt"></span>
+                    </p>
+                    <div class="sp-divider"></div>
+                    <p class="sp-price-total">
+                        <span>Total</span>
+                        <span id="totalAmt"></span>
+                    </p>
+                </div>
+
+                <button class="sp-btn-brand w-100" id="bookBtn" type="submit" style="display:block; text-align:center; border:none; cursor:pointer;">Pay & Book Now</button>
+                <p class="text-muted text-center mt-2 mb-0" style="font-size: 0.75rem;">
+                    <i class="fa-solid fa-lock"></i> Secure test payment via Razorpay — no real money is charged.
+                </p>
+            </form>
+        </div>
+        <% } else { %>
+        <div id="booking" class="sp-booking-widget mb-4 text-center">
+            <h4>Book your stay</h4>
+            <p class="sp-subinfo">Login to book this stay</p>
+            <a href="/login?redirect=/listings/<%= listing._id %>" class="sp-btn-brand w-100" style="display:block;">Login to Book</a>
+        </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const pricePerNight = <%- listing.price %>;
+        const serviceFeePercent = 0.10;
+
+        const checkInInput = document.getElementById("checkIn");
+        const checkOutInput = document.getElementById("checkOut");
+        const errorBox = document.getElementById("bookingError");
+        const breakdown = document.getElementById("priceBreakdown");
+        const form = document.getElementById("bookingForm");
+
+        if (!checkInInput) return;
+
+        const todayStr = new Date().toISOString().split("T")[0];
+        checkInInput.setAttribute("min", todayStr);
+
+        function datesOverlap(inA, outA, inB, outB) {
+            return inA < outB && inB < outA;
+        }
+
+        function showError(msg) {
+            errorBox.textContent = msg;
+            errorBox.classList.remove("d-none");
+            breakdown.classList.add("d-none");
+        }
+
+        function clearError() {
+            errorBox.classList.add("d-none");
+            errorBox.textContent = "";
+        }
+
+        function updateBreakdown() {
+            clearError();
+            if (!checkInInput.value || !checkOutInput.value) {
+                breakdown.classList.add("d-none");
+                return;
+            }
+
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+            checkOutInput.setAttribute("min", checkInInput.value);
+
+            if (checkOut <= checkIn) {
+                showError("Check-out date must be after check-in date");
+                return;
+            }
+
+            const clash = bookedRanges.some((b) =>
+                datesOverlap(checkIn, checkOut, new Date(b.checkIn), new Date(b.checkOut))
+            );
+            if (clash) {
+                showError("These dates are already booked. Please pick different dates.");
+                return;
+            }
+
+            const nights = Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            const subtotal = nights * pricePerNight;
+            const fee = Math.round(subtotal * serviceFeePercent);
+            const total = subtotal + fee;
+
+            document.getElementById("nightsLabel").textContent =
+                `₹${pricePerNight.toLocaleString("en-IN")} x ${nights} night${nights > 1 ? "s" : ""}`;
+            document.getElementById("subtotalAmt").textContent = `₹${subtotal.toLocaleString("en-IN")}`;
+            document.getElementById("feeAmt").textContent = `₹${fee.toLocaleString("en-IN")}`;
+            document.getElementById("totalAmt").textContent = `₹${total.toLocaleString("en-IN")}`;
+            breakdown.classList.remove("d-none");
+        }
+
+        checkInInput.addEventListener("change", updateBreakdown);
+        checkOutInput.addEventListener("change", updateBreakdown);
+
+        form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+            const clash = bookedRanges.some((b) =>
+                datesOverlap(checkIn, checkOut, new Date(b.checkIn), new Date(b.checkOut))
+            );
+            if (checkOut <= checkIn || clash) {
+                updateBreakdown();
+                return;
+            }
+
+            const bookBtn = document.getElementById("bookBtn");
+            bookBtn.disabled = true;
+            bookBtn.textContent = "Processing...";
+
+            try {
+                // STEP 1: ask the server to create a Razorpay order for this booking
+                const orderRes = await fetch(`/listings/${listing._id}/create-order`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        booking: {
+                            checkIn: checkInInput.value,
+                            checkOut: checkOutInput.value,
+                            guests: document.getElementById("guests").value,
+                        },
+                    }),
+                });
+
+                const orderData = await orderRes.json();
+
+                if (!orderRes.ok) {
+                    showError(orderData.error || "Something went wrong. Please try again.");
+                    bookBtn.disabled = false;
+                    bookBtn.textContent = "Pay & Book Now";
+                    return;
+                }
+
+                // STEP 2: open Razorpay's checkout (TEST MODE — no real money is charged)
+                const options = {
+                    key: orderData.key,
+                    amount: orderData.amount,
+                    currency: "INR",
+                    name: "StayHub",
+                    description: listing.title,
+                    order_id: orderData.orderId,
+                    prefill: {
+                        name: typeof razorpayUserName !== "undefined" ? razorpayUserName : "",
+                        email: typeof razorpayUserEmail !== "undefined" ? razorpayUserEmail : "",
+                    },
+                    theme: { color: "#fe424d" },
+                    handler: function (response) {
+                        // STEP 3: payment succeeded — submit proof to the server to confirm the booking
+                        const proofForm = document.createElement("form");
+                        proofForm.method = "POST";
+                        proofForm.action = `/listings/${listing._id}/verify-payment`;
+
+                        const fields = {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            checkIn: checkInInput.value,
+                            checkOut: checkOutInput.value,
+                            guests: document.getElementById("guests").value,
+                        };
+
+                        for (const key in fields) {
+                            const input = document.createElement("input");
+                            input.type = "hidden";
+                            input.name = key;
+                            input.value = fields[key];
+                            proofForm.appendChild(input);
+                        }
+
+                        document.body.appendChild(proofForm);
+                        proofForm.submit();
+                    },
+                    modal: {
+                        ondismiss: function () {
+                            bookBtn.disabled = false;
+                            bookBtn.textContent = "Pay & Book Now";
+                        },
+                    },
+                };
+
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } catch (err) {
+                showError("Could not start payment. Please try again.");
+                bookBtn.disabled = false;
+                bookBtn.textContent = "Pay & Book Now";
+            }
+        });
+    })();
+</script>
+
+<script src="/js/map.js"></script>

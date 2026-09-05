@@ -1,0 +1,204 @@
+<% layout("/layouts/boilerplate") %>
+
+<h3 class="mt-3 mb-4">My Trips</h3>
+
+<% if (bookings.length === 0) { %>
+    <p>
+        You have no bookings yet.
+        <a
+            href="/listings"
+            style="color: var(--brand); font-weight: 600;"
+        >
+            Explore stays
+        </a>
+    </p>
+<% } %>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+
+    <% for (booking of bookings) { %>
+
+        <% if (booking.listing) { %>
+
+            <div class="col">
+
+                <div
+                    class="card trip-card h-100"
+                    style="
+                        overflow: hidden !important;
+                        border-radius: 18px !important;
+                    "
+                >
+
+                    <!-- IMAGE -->
+                    <img
+                        src="<%= booking.listing.image.url %>"
+                        class="card-img-top"
+                        alt="Listing Image"
+                        style="
+                            height: 200px !important;
+                            object-fit: cover !important;
+                            border-radius: 0 !important;
+                            display: block;
+                            width: 100%;
+                        "
+                    >
+
+                    <!-- CARD BODY -->
+                    <div
+                        class="card-body"
+                        style="
+                            padding: 20px 20px 24px 20px !important;
+                        "
+                    >
+
+                        <!-- CONTENT WRAPPER -->
+                        <div
+                            style="
+                                margin-left: 18px !important;
+                                margin-right: 5px !important;
+                            "
+                        >
+
+                            <!-- TITLE -->
+                            <h5
+                                class="card-title"
+                                style="
+                                    margin: 0 0 14px 0 !important;
+                                    padding: 0 !important;
+                                    font-size: 25px;
+                                    font-weight: 500;
+                                "
+                            >
+                                <%= booking.listing.title %>
+                            </h5>
+
+                            <!-- CHECK IN -->
+                            <p
+                                class="card-text"
+                                style="
+                                    margin: 0 0 7px 0 !important;
+                                    padding: 0 !important;
+                                "
+                            >
+                                <b>Check-in:</b>
+                                <%= booking.checkIn.toDateString() %>
+                            </p>
+
+                            <!-- CHECK OUT -->
+                            <p
+                                class="card-text"
+                                style="
+                                    margin: 0 0 7px 0 !important;
+                                    padding: 0 !important;
+                                "
+                            >
+                                <b>Check-out:</b>
+                                <%= booking.checkOut.toDateString() %>
+                            </p>
+
+                            <!-- GUESTS -->
+                            <p
+                                class="card-text"
+                                style="
+                                    margin: 0 0 7px 0 !important;
+                                    padding: 0 !important;
+                                "
+                            >
+                                <b>Guests:</b>
+                                <%= booking.guests %>
+                            </p>
+
+                            <!-- TOTAL -->
+                            <p
+                                class="card-text"
+                                style="
+                                    margin: 0 0 14px 0 !important;
+                                    padding: 0 !important;
+                                "
+                            >
+                                <b>Total:</b>
+                                &#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
+                            </p>
+
+                            <!-- STATUS -->
+                            <p
+                                class="card-text"
+                                style="
+                                    margin: 0 0 16px 0 !important;
+                                    padding: 0 !important;
+                                "
+                            >
+                                <span
+                                    class="status-badge <%= booking.status === 'cancelled' ? 'status-cancelled' : 'status-confirmed' %>"
+                                    style="
+                                        display: inline-block;
+                                        padding: 7px 18px !important;
+                                        border-radius: 20px !important;
+                                    "
+                                >
+                                    <%= booking.status %>
+                                </span>
+                            </p>
+
+                            <!-- BUTTONS -->
+                            <div
+                                class="d-flex gap-2 flex-wrap"
+                                style="
+                                    margin: 0 !important;
+                                    padding: 0 !important;
+                                "
+                            >
+
+                                <!-- VIEW LISTING -->
+                                <a
+                                    href="/listings/<%= booking.listing._id %>"
+                                    class="btn btn-brand-outline btn-sm"
+                                    style="
+                                        padding: 8px 18px !important;
+                                        border-radius: 20px !important;
+                                    "
+                                >
+                                    View Listing
+                                </a>
+
+                                <!-- CANCEL -->
+                                <% if (booking.status !== 'cancelled') { %>
+
+                                    <form
+                                        method="POST"
+                                        action="/bookings/<%= booking._id %>?_method=DELETE"
+                                        style="
+                                            margin: 0 !important;
+                                            padding: 0 !important;
+                                        "
+                                    >
+                                        <button
+                                            type="submit"
+                                            class="btn btn-dark-outline btn-sm"
+                                            style="
+                                                padding: 8px 18px !important;
+                                                border-radius: 20px !important;
+                                            "
+                                        >
+                                            Cancel
+                                        </button>
+                                    </form>
+
+                                <% } %>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        <% } %>
+
+    <% } %>
+
+</div>

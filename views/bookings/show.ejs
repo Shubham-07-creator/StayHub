@@ -1,0 +1,74 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="confirmation-card card">
+    <h3 class="mb-3">
+        <i class="fa-solid fa-circle-check" style="color: #1a7a3e;"></i>
+        Booking Confirmed
+    </h3>
+
+    <img
+        src="<%= booking.listing.image.url %>"
+        class="card-img-top mb-3"
+        alt="Listing Image"
+        style="height: 220px; object-fit: cover; border-radius: 0.75rem;"
+    />
+
+    <h5><%= booking.listing.title %></h5>
+    <p class="listing-subinfo mb-3">
+        <%= booking.listing.location %>, <%= booking.listing.country %>
+    </p>
+
+    <div class="section-divider"></div>
+
+    <p class="price-breakdown-row">
+        <span>Check-in</span>
+        <b style="color: var(--text-dark);"><%= booking.checkIn.toDateString() %></b>
+    </p>
+    <p class="price-breakdown-row">
+        <span>Check-out</span>
+        <b style="color: var(--text-dark);"><%= booking.checkOut.toDateString() %></b>
+    </p>
+    <p class="price-breakdown-row">
+        <span>Guests</span>
+        <b style="color: var(--text-dark);"><%= booking.guests %></b>
+    </p>
+
+    <div class="section-divider"></div>
+
+    <p class="price-breakdown-row">
+        <span>&#8377;<%= booking.pricePerNight.toLocaleString("en-IN") %> x <%= booking.nights %> night<%= booking.nights > 1 ? "s" : "" %></span>
+        <span>&#8377;<%= booking.subtotal.toLocaleString("en-IN") %></span>
+    </p>
+    <p class="price-breakdown-row">
+        <span>Service fee</span>
+        <span>&#8377;<%= booking.serviceFee.toLocaleString("en-IN") %></span>
+    </p>
+
+    <div class="section-divider"></div>
+
+    <p class="price-breakdown-total mb-3">
+        <span>Total paid</span>
+        <span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span>
+    </p>
+
+    <p class="mb-3">
+        <span class="status-badge <%= booking.status === 'cancelled' ? 'status-cancelled' : 'status-confirmed' %>">
+            <%= booking.status %>
+        </span>
+    </p>
+
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="/listings/<%= booking.listing._id %>" class="btn btn-brand-outline">
+            View Listing
+        </a>
+        <a href="/bookings" class="btn btn-brand-outline">
+            My Trips
+        </a>
+        <% if (booking.status !== 'cancelled') { %>
+        <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE">
+            <button class="btn btn-dark-outline">Cancel Booking</button>
+        </form>
+        <% } %>
+    </div>
+
+</div>

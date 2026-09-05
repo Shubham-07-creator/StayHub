@@ -1,0 +1,66 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <h1>Sign up on StayHub</h1>
+        <form action="/signup" method="POST" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input
+                name="username"
+                id="username"
+                type="text"
+                class="form-control"
+                required
+                />
+                <div class="valid-feedback">Looks Good!</div>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input
+                name="email"
+                id="email"
+                type="email"
+                class="form-control"
+                required
+                />
+                <div class="form-text">We'll send a verification link to this email.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input
+                    name="password"
+                    id="password"
+                    type="password"
+                    class="form-control"
+                    required
+                    />
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        id="togglePassword"
+                        tabindex="-1"
+                    ><i class="fa-solid fa-eye" id="toggleIcon"></i></button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-brand">Sign Up</button>
+        </form>
+        <p class="text-center mt-3 mb-0">
+            Already have an account? <a href="/login" style="color: var(--brand); font-weight: 600;">Log in</a>
+        </p>
+    </div>
+</div>
+
+<script>
+    const pwdInput = document.getElementById("password");
+    const toggleBtn = document.getElementById("togglePassword");
+    const toggleIcon = document.getElementById("toggleIcon");
+
+    toggleBtn.addEventListener("click", () => {
+        const isHidden = pwdInput.type === "password";
+        pwdInput.type = isHidden ? "text" : "password";
+        toggleIcon.classList.toggle("fa-eye");
+        toggleIcon.classList.toggle("fa-eye-slash");
+    });
+</script>
