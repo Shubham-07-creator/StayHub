@@ -8,10 +8,7 @@ const { saveRedirectUrl, isLoggedIn } = require('../middleware.js');
 
 const userController = require('../controllers/users.js');
 
-// Only login gets a rate limiter (protects against password brute-forcing).
-// Signup/forgot-password/reset-password/verify-email are left unlimited
-// since they don't gain an attacker anything by brute-forcing, and a limiter
-// there just gets in the way of normal testing.
+// Limits brute-force attacks on login: 30 attempts per IP every 15 minutes
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 30,
@@ -43,14 +40,7 @@ router.route("/login")
 
 router.get("/logout", userController.logout);
 
-// Email verification (OTP-based)
-router.route("/verify-email")
-    .get(userController.renderVerifyEmailForm)
-    .post(wrapAsync(userController.verifyEmail));
-
-router.post("/resend-verification", wrapAsync(userController.resendVerificationEmail));
-
-// Forgot / reset password
+// Forgot / reset password (unverified — see security note in controller)
 router.route("/forgot-password")
     .get(userController.renderForgotPasswordForm)
     .post(wrapAsync(userController.forgotPassword));

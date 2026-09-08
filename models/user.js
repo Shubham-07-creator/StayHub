@@ -12,15 +12,6 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    isEmailVerified: {
-        type: Boolean,
-        default: false,
-    },
-    emailOtp: String,
-    emailOtpExpires: Date,
-
-    resetPasswordOtp: String,
-    resetPasswordOtpExpires: Date,
 });
 
 // Login happens with "email" instead of the default "username" field
