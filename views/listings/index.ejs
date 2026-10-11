@@ -535,9 +535,17 @@
                 <i class="fa-solid fa-fire"></i>
                 <span>Trending</span>
             </a>
+            <a href="<%= buildCategoryUrl('beach') %>" class="ip-cat-item <%= category === 'beach' ? 'active' : '' %>">
+                <i class="fa-solid fa-umbrella-beach"></i>
+                <span>Beachfront</span>
+            </a>
             <a href="<%= buildCategoryUrl('rooms') %>" class="ip-cat-item <%= category === 'rooms' ? 'active' : '' %>">
                 <i class="fa-solid fa-bed"></i>
                 <span>Rooms</span>
+            </a>
+            <a href="<%= buildCategoryUrl('villas') %>" class="ip-cat-item <%= category === 'villas' ? 'active' : '' %>">
+                <i class="fa-solid fa-hotel"></i>
+                <span>Luxury Villas</span>
             </a>
             <a href="<%= buildCategoryUrl('iconic') %>" class="ip-cat-item <%= category === 'iconic' ? 'active' : '' %>">
                 <i class="fa-solid fa-mountain-city"></i>
@@ -555,17 +563,17 @@
                 <i class="fa-solid fa-person-swimming"></i>
                 <span>Amazing Pools</span>
             </a>
+            <a href="<%= buildCategoryUrl('treehouses') %>" class="ip-cat-item <%= category === 'treehouses' ? 'active' : '' %>">
+                <i class="fa-solid fa-tree"></i>
+                <span>Treehouses</span>
+            </a>
+            <a href="<%= buildCategoryUrl('tropical') %>" class="ip-cat-item <%= category === 'tropical' ? 'active' : '' %>">
+                <i class="fa-solid fa-seedling"></i>
+                <span>Tropical</span>
+            </a>
             <a href="<%= buildCategoryUrl('camping') %>" class="ip-cat-item <%= category === 'camping' ? 'active' : '' %>">
                 <i class="fa-solid fa-campground"></i>
                 <span>Camping</span>
-            </a>
-            <a href="<%= buildCategoryUrl('farms') %>" class="ip-cat-item <%= category === 'farms' ? 'active' : '' %>">
-                <i class="fa-solid fa-tractor"></i>
-                <span>Farms</span>
-            </a>
-            <a href="<%= buildCategoryUrl('arctic') %>" class="ip-cat-item <%= category === 'arctic' ? 'active' : '' %>">
-                <i class="fa-regular fa-snowflake"></i>
-                <span>Arctic</span>
             </a>
             <a href="<%= buildCategoryUrl('domes') %>" class="ip-cat-item <%= category === 'domes' ? 'active' : '' %>">
                 <i class="fa-solid fa-igloo"></i>
@@ -573,7 +581,27 @@
             </a>
             <a href="<%= buildCategoryUrl('boats') %>" class="ip-cat-item <%= category === 'boats' ? 'active' : '' %>">
                 <i class="fa-solid fa-sailboat"></i>
-                <span>Boats</span>
+                <span>Houseboats</span>
+            </a>
+            <a href="<%= buildCategoryUrl('farms') %>" class="ip-cat-item <%= category === 'farms' ? 'active' : '' %>">
+                <i class="fa-solid fa-tractor"></i>
+                <span>Farms</span>
+            </a>
+            <a href="<%= buildCategoryUrl('desert') %>" class="ip-cat-item <%= category === 'desert' ? 'active' : '' %>">
+                <i class="fa-solid fa-sun"></i>
+                <span>Desert</span>
+            </a>
+            <a href="<%= buildCategoryUrl('islands') %>" class="ip-cat-item <%= category === 'islands' ? 'active' : '' %>">
+                <i class="fa-solid fa-water"></i>
+                <span>Islands</span>
+            </a>
+            <a href="<%= buildCategoryUrl('heritage') %>" class="ip-cat-item <%= category === 'heritage' ? 'active' : '' %>">
+                <i class="fa-solid fa-monument"></i>
+                <span>Heritage</span>
+            </a>
+            <a href="<%= buildCategoryUrl('arctic') %>" class="ip-cat-item <%= category === 'arctic' ? 'active' : '' %>">
+                <i class="fa-regular fa-snowflake"></i>
+                <span>Arctic</span>
             </a>
             <% if (category) { %>
             <a href="<%= buildCategoryUrl(null) %>" class="ip-cat-item text-danger">

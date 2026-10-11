@@ -12,6 +12,7 @@ module.exports.listingSchema = Joi.object({
           .valid(
             "trending",
             "rooms",
+            "beach",
             "iconic",
             "mountains",
             "castles",
@@ -20,7 +21,13 @@ module.exports.listingSchema = Joi.object({
             "farms",
             "arctic",
             "domes",
-            "boats"
+            "boats",
+            "villas",
+            "treehouses",
+            "tropical",
+            "islands",
+            "desert",
+            "heritage"
             )
             .required(),
 
