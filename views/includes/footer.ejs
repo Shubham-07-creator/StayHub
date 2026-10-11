@@ -1,166 +1,558 @@
 <footer class="site-footer">
-  <div class="container">
-    <div class="row footer-top py-4">
-      <div class="col-12 col-md-4 mb-3 mb-md-0">
-        <h5 class="footer-brand">StayHub</h5>
-        <p class="footer-tagline">Find your next stay, anywhere in the world.</p>
-        <div class="f-info-socials">
-          <i class="fa-brands fa-facebook"></i>
-          <i class="fa-brands fa-square-instagram"></i>
-          <i class="fa-brands fa-linkedin"></i>
+  <div class="container pt-5 pb-3">
+
+    <!-- 1. PRE-FOOTER TRUST & ASSURANCE BANNER -->
+    <div class="footer-trust-banner">
+      <div class="row g-4 align-items-center">
+        <div class="col-6 col-lg-3">
+          <div class="trust-item">
+            <div class="trust-icon-box">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+              <h6 class="trust-title">StayCover Protection</h6>
+              <p class="trust-desc">Comprehensive safeguard on every verified stay</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="trust-item">
+            <div class="trust-icon-box">
+              <i class="fa-solid fa-gem"></i>
+            </div>
+            <div>
+              <h6 class="trust-title">Curated Stays</h6>
+              <p class="trust-desc">100% verified luxury villas & heritage retreats</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="trust-item">
+            <div class="trust-icon-box">
+              <i class="fa-solid fa-receipt"></i>
+            </div>
+            <div>
+              <h6 class="trust-title">Transparent GST Tariff</h6>
+              <p class="trust-desc">Govt. compliant billing & serialized tax invoices</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <div class="trust-item">
+            <div class="trust-icon-box">
+              <i class="fa-solid fa-headset"></i>
+            </div>
+            <div>
+              <h6 class="trust-title">24/7 Priority Support</h6>
+              <p class="trust-desc">Round-the-clock emergency host & guest care</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MAIN 4-COLUMN FOOTER NAVIGATION -->
+    <div class="row g-4 mb-4">
+
+      <!-- COLUMN 1: BRAND IDENTITY, MISSION & SOCIAL -->
+      <div class="col-12 col-md-6 col-lg-4 pe-lg-4">
+        <a href="/listings" class="footer-brand-wrap">
+          <div class="footer-brand-logo">
+            <i class="fa-solid fa-house"></i>
+          </div>
+          <span class="footer-brand-text">StayHub</span>
+        </a>
+        <p class="footer-tagline-text">
+          Discover handpicked luxury villas, serene mountain chalets, and architectural homestays across India. Thoughtfully designed for travelers seeking unforgettable living experiences.
+        </p>
+
+        <!-- SOCIAL MEDIA BUTTON PILLS -->
+        <div class="footer-social-cluster">
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Instagram" aria-label="Instagram">
+            <i class="fa-brands fa-instagram"></i>
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="LinkedIn" aria-label="LinkedIn">
+            <i class="fa-brands fa-linkedin-in"></i>
+          </a>
+          <a href="https://github.com/Shubham-07-creator/StayHub" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="GitHub" aria-label="GitHub">
+            <i class="fa-brands fa-github"></i>
+          </a>
+          <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Twitter / X" aria-label="Twitter">
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="footer-social-btn" title="Facebook" aria-label="Facebook">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+        </div>
+
+        <!-- LIVE UPTIME STATUS BADGE -->
+        <div>
+          <span class="footer-status-pill">
+            <span class="status-pulse-dot"></span>
+            All Systems Operational &bull; 99.98% Uptime
+          </span>
         </div>
       </div>
 
-      <div class="col-6 col-md-4 mb-3 mb-md-0">
-        <h6 class="footer-heading">Company</h6>
-        <ul class="footer-links">
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">About Us</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#careersModal">Careers</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#contactModal">Contact</a></li>
+      <!-- COLUMN 2: POPULAR CATEGORIES / EXPLORE -->
+      <div class="col-6 col-md-6 col-lg-2">
+        <h6 class="footer-col-title">Explore Stays</h6>
+        <ul class="footer-nav-list">
+          <li>
+            <a href="/listings?category=beach" class="footer-nav-link">
+              <i class="fa-solid fa-umbrella-beach me-1 text-danger"></i> Beachfront
+            </a>
+          </li>
+          <li>
+            <a href="/listings?category=mountains" class="footer-nav-link">
+              <i class="fa-solid fa-mountain me-1 text-danger"></i> Chalets
+            </a>
+          </li>
+          <li>
+            <a href="/listings?category=castles" class="footer-nav-link">
+              <i class="fa-solid fa-chess-rook me-1 text-danger"></i> Palaces
+            </a>
+          </li>
+          <li>
+            <a href="/listings?category=camping" class="footer-nav-link">
+              <i class="fa-solid fa-campground me-1 text-danger"></i> Glass Domes
+            </a>
+          </li>
+          <li>
+            <a href="/listings?category=pools" class="footer-nav-link">
+              <i class="fa-solid fa-water-ladder me-1 text-danger"></i> Private Pools
+            </a>
+          </li>
+          <li>
+            <a href="/listings" class="footer-nav-link">
+              <i class="fa-solid fa-compass me-1 text-danger"></i> All Destinations
+            </a>
+          </li>
         </ul>
       </div>
 
-      <div class="col-6 col-md-4">
-        <h6 class="footer-heading">Support</h6>
-        <ul class="footer-links">
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a></li>
-          <li><a href="#" data-bs-toggle="modal" data-bs-target="#helpModal">Help Center</a></li>
+      <!-- COLUMN 3: HOSTING & COMPANY -->
+      <div class="col-6 col-md-6 col-lg-3">
+        <h6 class="footer-col-title">Hosting & Company</h6>
+        <ul class="footer-nav-list">
+          <li>
+            <a href="/listings/new" class="footer-nav-link">
+              <i class="fa-solid fa-plus-circle me-1 text-danger"></i> Host a Stay
+              <span class="footer-badge-pill ms-1">Earn</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal" class="footer-nav-link">
+              <i class="fa-solid fa-angle-right"></i> About StayHub
+            </a>
+          </li>
+          <li>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#careersModal" class="footer-nav-link">
+              <i class="fa-solid fa-angle-right"></i> Careers
+              <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill ms-1" style="font-size: 0.65rem;">Hiring</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#contactModal" class="footer-nav-link">
+              <i class="fa-solid fa-angle-right"></i> Contact HQ
+            </a>
+          </li>
+          <li>
+            <a href="/admin/dashboard" class="footer-nav-link">
+              <i class="fa-solid fa-crown me-1 text-warning"></i> Host & Admin Portal
+            </a>
+          </li>
         </ul>
       </div>
+
+      <!-- COLUMN 4: SUPPORT & SAFETY -->
+      <div class="col-12 col-md-6 col-lg-3">
+        <h6 class="footer-col-title">Safety & Support</h6>
+        <ul class="footer-nav-list">
+          <li>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#helpModal" class="footer-nav-link">
+              <i class="fa-solid fa-circle-question me-1 text-danger"></i> Help Center (24/7)
+            </a>
+          </li>
+          <li>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="footer-nav-link">
+              <i class="fa-solid fa-angle-right"></i> Privacy Policy
+            </a>
+          </li>
+          <li>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="footer-nav-link">
+              <i class="fa-solid fa-angle-right"></i> Terms of Service
+            </a>
+          </li>
+        </ul>
+
+        <!-- EMERGENCY HOTLINES MINI CARD -->
+        <div class="footer-emergency-card">
+          <div class="em-title">
+            <i class="fa-solid fa-triangle-exclamation"></i> Emergency Helplines (India)
+          </div>
+          <div class="em-numbers">
+            <span><i class="fa-solid fa-phone text-danger me-1"></i>Police: 100</span>
+            <span>&bull;</span>
+            <span>Amb: 102</span>
+            <span>&bull;</span>
+            <span>Fire: 101</span>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="footer-bottom text-center py-3">
-      &copy; <%= new Date().getFullYear() %> StayHub Private Limited. All rights reserved.
+    <!-- 3. BOTTOM BAR (LEGAL & REGION/CURRENCY/CREDITS) -->
+    <div class="footer-bottom-wrap">
+      
+      <!-- COPYRIGHT & LEGAL -->
+      <div class="d-flex align-items-center gap-3 flex-wrap">
+        <span>&copy; <%= new Date().getFullYear() %> StayHub Private Limited.</span>
+        <div class="footer-legal-links">
+          <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal" class="footer-legal-link">Privacy</a>
+          <span>&bull;</span>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal" class="footer-legal-link">Terms</a>
+          <span>&bull;</span>
+          <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal" class="footer-legal-link">Company</a>
+          <span>&bull;</span>
+          <a href="/listings" class="footer-legal-link">Sitemap</a>
+        </div>
+      </div>
+
+      <!-- SELECTORS & CREATOR CREDIT -->
+      <div class="footer-selector-cluster">
+        <button type="button" class="footer-pill-btn" title="Country / Region">
+          <i class="fa-solid fa-globe text-danger"></i> English (IN)
+        </button>
+
+        <button type="button" class="footer-pill-btn" title="Currency">
+          <i class="fa-solid fa-indian-rupee-sign text-success"></i> INR (₹)
+        </button>
+
+        <div class="footer-author-credit ms-lg-2">
+          <span>Crafted by</span>
+          <a href="mailto:Shubhamkumar979883@gmail.com" class="author-link">Shubham Kumar</a>
+          <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill py-1 px-2" style="font-size: 0.65rem;">
+            <i class="fa-solid fa-crown text-warning me-1"></i>Admin
+          </span>
+        </div>
+      </div>
+
     </div>
+
   </div>
 </footer>
 
-<!-- About Us Modal -->
-<div class="modal fade" id="aboutModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">About StayHub</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>StayHub is your trusted platform for finding unique stays around the world — from cozy cabins to luxury villas. We connect travelers with hosts to create memorable experiences.</p>
-        <p><b>Project Completed:</b> 2026</p>
-        <p><b>Mission:</b> Making travel accessible, affordable, and unforgettable for everyone.</p>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- ============================================
+     UPGRADED LUXURY MODALS (ELEGANT & RESPONSIVE)
+     ============================================ -->
 
-<!-- Careers Modal -->
-<div class="modal fade" id="careersModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Careers at StayHub</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>We're always looking for talented individuals to join our team!</p>
-        <p><b>Open Positions:</b></p>
-        <ul>
-          <li>Frontend Developer</li>
-          <li>Backend Developer</li>
-          <li>Customer Support Executive</li>
-        </ul>
-        <p>Send your resume to: <a href="mailto:Shubhamkumar979883@gmail.com">Shubhamkumar979883@gmail.com</a></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Contact Modal -->
-<div class="modal fade" id="contactModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Contact Us</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p><i class="fa-solid fa-envelope me-2"></i><b>Email:</b> <a href="mailto:Shubhamkumar979883@gmail.com">Shubhamkumar979883@gmail.com</a></p>
-        <p><i class="fa-solid fa-phone me-2"></i><b>Phone:</b> <a href="tel:+918986339496">+91 89863 39496</a></p>
-        <p><i class="fa-solid fa-location-dot me-2"></i><b>Address:</b> StayHub HQ, India</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Privacy Policy Modal -->
-<div class="modal fade" id="privacyModal" tabindex="-1">
+<!-- 1. ABOUT US MODAL -->
+<div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Privacy Policy</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-bottom bg-danger-subtle p-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-solid fa-hotel"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-dark mb-0" id="aboutModalLabel">About StayHub</h5>
+            <small class="text-danger fw-semibold">Next-Gen Vacation Stays & Homestays</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <p>Your privacy is important to us. StayHub collects only necessary information to provide our services, including your name, email, and booking details.</p>
-        <p>We do not sell or share your personal data with third parties without your consent, except as required by law.</p>
-        <p>For any privacy concerns, contact us at <a href="mailto:Shubhamkumar979883@gmail.com">Shubhamkumar979883@gmail.com</a></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Terms of Service Modal -->
-<div class="modal fade" id="termsModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Terms of Service</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>By using StayHub, you agree to the following terms:</p>
-        <ul>
-          <li>You must be 18+ years old to create a booking.</li>
-          <li>All bookings are subject to host approval and availability.</li>
-          <li>Cancellation policies vary by listing.</li>
-          <li>StayHub is not liable for disputes between hosts and guests.</li>
-        </ul>
-        <p>For full terms, contact <a href="mailto:Shubhamkumar979883@gmail.com">Shubhamkumar979883@gmail.com</a></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Help Center Modal -->
-<div class="modal fade" id="helpModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Help Center</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p>Need help? We're here for you 24/7!</p>
-
-        <p><i class="fa-solid fa-envelope me-2"></i><b>Email Support:</b><br>
-          <a href="mailto:Shubhamkumar979883@gmail.com">Shubhamkumar979883@gmail.com</a>
+      <div class="modal-body p-4">
+        <p class="lead fs-6 text-muted mb-3" style="line-height: 1.6;">
+          StayHub is a modern, full-stack vacation rental platform designed to connect wanderers with handpicked architectural villas, heritage havelis, and mountain chalets across the globe.
         </p>
 
-        <p><i class="fa-solid fa-phone-volume me-2"></i><b>Customer Support:</b><br>
-          <a href="tel:+918986339496">+91 89863 39496</a>
-        </p>
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <div class="p-3 rounded-3 bg-light border">
+              <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-bullseye text-danger me-2"></i>Our Mission</h6>
+              <p class="small text-muted mb-0">Democratizing world-class luxury stays with 100% transparent pricing and authentic host connections.</p>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded-3 bg-light border">
+              <h6 class="fw-bold text-dark mb-1"><i class="fa-solid fa-shield-check text-success me-2"></i>Verified Stays</h6>
+              <p class="small text-muted mb-0">Every listing on StayHub undergoes rigorous quality checks and geocoded location verification.</p>
+            </div>
+          </div>
+        </div>
 
-        <hr>
-
-        <p class="text-danger fw-bold mb-2"><i class="fa-solid fa-triangle-exclamation me-2"></i>Emergency Contacts</p>
-        <ul class="list-unstyled">
-          <li><i class="fa-solid fa-fire-flame-curved me-2 text-danger"></i><b>Fire Brigade:</b> 101</li>
-          <li><i class="fa-solid fa-truck-medical me-2 text-danger"></i><b>Ambulance:</b> 102</li>
-          <li><i class="fa-solid fa-shield-halved me-2 text-danger"></i><b>Police:</b> 100</li>
-          <li><i class="fa-solid fa-house-fire me-2 text-danger"></i><b>Disaster Management:</b> 108</li>
-        </ul>
-        <p class="small text-muted mt-2">For urgent safety issues during your stay, please call the relevant emergency number immediately.</p>
+        <div class="p-3 rounded-3 bg-danger-subtle border border-danger-subtle">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="fa-solid fa-crown text-danger"></i>
+            <span class="fw-bold text-dark">Platform Leadership</span>
+          </div>
+          <p class="small text-muted mb-0">
+            Founded & architected by <b>Shubham Kumar</b>. Powered by Node.js, Express, MongoDB Atlas, Mapbox GL JS, and Razorpay.
+          </p>
+        </div>
       </div>
     </div>
   </div>
-</div> 
+</div>
+
+<!-- 2. CAREERS MODAL -->
+<div class="modal fade" id="careersModal" tabindex="-1" aria-labelledby="careersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-bottom bg-success-subtle p-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-solid fa-briefcase"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-dark mb-0" id="careersModalLabel">Careers at StayHub</h5>
+            <small class="text-success fw-semibold">Build the Future of Hospitality</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="small text-muted mb-3">
+          We are continuously scaling our engineering and guest support teams. Come build hyper-fast travel technology with us!
+        </p>
+
+        <h6 class="fw-bold text-dark mb-2">Current Openings:</h6>
+        <ul class="list-group list-group-flush border rounded-3 mb-3">
+          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+            <div>
+              <span class="fw-bold d-block">Full-Stack Node.js Engineer</span>
+              <small class="text-muted">Remote &bull; Full-Time</small>
+            </div>
+            <span class="badge bg-danger rounded-pill">Open</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+            <div>
+              <span class="fw-bold d-block">UI/UX Product Designer</span>
+              <small class="text-muted">Hybrid &bull; Full-Time</small>
+            </div>
+            <span class="badge bg-danger rounded-pill">Open</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+            <div>
+              <span class="fw-bold d-block">Guest Experience Concierge</span>
+              <small class="text-muted">India HQ &bull; Full-Time</small>
+            </div>
+            <span class="badge bg-danger rounded-pill">Open</span>
+          </li>
+        </ul>
+
+        <p class="small text-muted mb-0">
+          Interested? Forward your portfolio/resume to: <br>
+          <a href="mailto:Shubhamkumar979883@gmail.com" class="fw-bold text-danger">Shubhamkumar979883@gmail.com</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. CONTACT US MODAL -->
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-bottom bg-danger-subtle p-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-solid fa-headset"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-dark mb-0" id="contactModalLabel">Contact HQ</h5>
+            <small class="text-danger fw-semibold">We'd love to hear from you</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="d-flex align-items-start gap-3 mb-3 p-3 rounded-3 bg-light border">
+          <i class="fa-solid fa-envelope fs-4 text-danger mt-1"></i>
+          <div>
+            <span class="fw-bold d-block">Official Email</span>
+            <a href="mailto:Shubhamkumar979883@gmail.com" class="text-decoration-none text-muted small">Shubhamkumar979883@gmail.com</a>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 mb-3 p-3 rounded-3 bg-light border">
+          <i class="fa-solid fa-phone fs-4 text-success mt-1"></i>
+          <div>
+            <span class="fw-bold d-block">Direct Telephone Support</span>
+            <a href="tel:+918986339496" class="text-decoration-none text-muted small">+91 89863 39496 (Mon - Sat, 9 AM - 8 PM IST)</a>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-3 p-3 rounded-3 bg-light border">
+          <i class="fa-solid fa-location-dot fs-4 text-primary mt-1"></i>
+          <div>
+            <span class="fw-bold d-block">StayHub Global Headquarters</span>
+            <p class="text-muted small mb-0">StayHub Technologies Pvt. Ltd., Bihar / Delhi NCR, India</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. PRIVACY POLICY MODAL -->
+<div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-bottom bg-info-subtle p-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle bg-info text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-dark mb-0" id="privacyModalLabel">Privacy Policy</h5>
+            <small class="text-info-emphasis fw-semibold">Your Data & Privacy Safeguards</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4" style="max-height: 65vh; overflow-y: auto;">
+        <h6 class="fw-bold text-dark">1. Information Collection & Usage</h6>
+        <p class="small text-muted mb-3">
+          We collect essential information required to execute reservations, including your verified name, email address, contact numbers, and transaction IDs. We strictly do not sell, rent, or trade your personal information to third-party advertisers.
+        </p>
+
+        <h6 class="fw-bold text-dark">2. Payment Security & Encryption</h6>
+        <p class="small text-muted mb-3">
+          All payments on StayHub are processed through Razorpay's PCI-DSS compliant secure infrastructure. We do not store your raw credit/debit card numbers or CVV on our servers.
+        </p>
+
+        <h6 class="fw-bold text-dark">3. Cookies & Session Storage</h6>
+        <p class="small text-muted mb-3">
+          We use secure HTTP-only cookies and local storage to preserve your login session, wishlist preferences, and theme choices (Light / Dark mode).
+        </p>
+
+        <h6 class="fw-bold text-dark">4. Privacy Inquiries</h6>
+        <p class="small text-muted mb-0">
+          For any data deletion or privacy inquiries, contact our Data Privacy Officer at <a href="mailto:Shubhamkumar979883@gmail.com" class="text-danger">Shubhamkumar979883@gmail.com</a>.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. TERMS OF SERVICE MODAL -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-bottom bg-warning-subtle p-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle bg-warning text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-solid fa-file-contract"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-dark mb-0" id="termsModalLabel">Terms of Service</h5>
+            <small class="text-warning-emphasis fw-semibold">Guest & Host Community Guidelines</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4" style="max-height: 65vh; overflow-y: auto;">
+        <h6 class="fw-bold text-dark">1. Eligibility</h6>
+        <p class="small text-muted mb-3">
+          Guests must be at least 18 years of age to book reservations on StayHub. All guests must provide accurate contact and check-in details.
+        </p>
+
+        <h6 class="fw-bold text-dark">2. Host & Property Rules</h6>
+        <p class="small text-muted mb-3">
+          Hosts agree to maintain property accuracy, verified photos, and stated amenities. Unannounced cancellations without emergency cause may lead to host account suspension.
+        </p>
+
+        <h6 class="fw-bold text-dark">3. Indian GST Tariff Compliance</h6>
+        <p class="small text-muted mb-3">
+          All bookings within India are subject to official Government Accommodation GST slabs (12% for tariffs &le; ₹7,500/night; 18% for tariffs &gt; ₹7,500/night). Applicable taxes are itemized on the final tax invoice.
+        </p>
+
+        <h6 class="fw-bold text-dark">4. Disputes & Resolution</h6>
+        <p class="small text-muted mb-0">
+          StayHub provides active mediation under the StayCover protocol. Contact <a href="mailto:Shubhamkumar979883@gmail.com" class="text-danger">Shubhamkumar979883@gmail.com</a> for claims within 24 hours of check-in.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. HELP CENTER MODAL -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+      <div class="modal-header border-bottom bg-danger-subtle p-3">
+        <div class="d-flex align-items-center gap-2">
+          <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+            <i class="fa-solid fa-headset"></i>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold text-dark mb-0" id="helpModalLabel">24/7 Help Center</h5>
+            <small class="text-danger fw-semibold">Always Here When You Need Us</small>
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <p class="small text-muted mb-3">
+          Have questions about your upcoming trip, host contact, or payment receipt?
+        </p>
+
+        <div class="p-3 rounded-3 bg-light border mb-3">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="fa-solid fa-envelope text-danger"></i>
+            <span class="fw-bold small">Direct Email Desk</span>
+          </div>
+          <a href="mailto:Shubhamkumar979883@gmail.com" class="small text-muted text-decoration-none">Shubhamkumar979883@gmail.com</a>
+        </div>
+
+        <div class="p-3 rounded-3 bg-light border mb-3">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="fa-solid fa-phone text-success"></i>
+            <span class="fw-bold small">Dedicated Helpline</span>
+          </div>
+          <a href="tel:+918986339496" class="small text-muted text-decoration-none">+91 89863 39496</a>
+        </div>
+
+        <hr class="my-3">
+
+        <h6 class="fw-bold text-danger mb-2">
+          <i class="fa-solid fa-triangle-exclamation me-1"></i> Emergency Indian Helplines
+        </h6>
+        <div class="row g-2 text-center">
+          <div class="col-6">
+            <div class="p-2 rounded bg-danger-subtle border border-danger-subtle">
+              <span class="d-block small fw-bold text-danger">Police</span>
+              <span class="fw-bold fs-6 text-dark">100</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2 rounded bg-danger-subtle border border-danger-subtle">
+              <span class="d-block small fw-bold text-danger">Ambulance</span>
+              <span class="fw-bold fs-6 text-dark">102 / 108</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2 rounded bg-danger-subtle border border-danger-subtle">
+              <span class="d-block small fw-bold text-danger">Fire Brigade</span>
+              <span class="fw-bold fs-6 text-dark">101</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="p-2 rounded bg-danger-subtle border border-danger-subtle">
+              <span class="d-block small fw-bold text-danger">Disaster Mgmt</span>
+              <span class="fw-bold fs-6 text-dark">108</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

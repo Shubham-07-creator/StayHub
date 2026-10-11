@@ -37,12 +37,18 @@ main()
     console.log(err);
 });
 
+mongoose.connection.on('error', (err) => {
+    console.warn('MongoDB connection warning:', err.message);
+});
+mongoose.connection.on('disconnected', () => {
+    console.warn('MongoDB disconnected. Mongoose will automatically reconnect.');
+});
+
 async function main() {
     await mongoose.connect(dbUrl, {
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 30000,
+        serverSelectionTimeoutMS: 8000,
+        socketTimeoutMS: 45000,
         maxPoolSize: 10,
-        minPoolSize: 2,
     });
 }
 
