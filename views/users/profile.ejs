@@ -1,0 +1,887 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+    /* ========================================================
+       AIRBNB-STYLE EXECUTIVE PROFILE DASHBOARD
+       ======================================================== */
+    :root {
+        --pf-brand: #fe424d;
+        --pf-brand-dark: #e02f3a;
+        --pf-brand-soft: rgba(254, 66, 77, 0.08);
+        --pf-card-bg: #ffffff;
+        --pf-card-alt: #f8fafc;
+        --pf-border: #e2e8f0;
+        --pf-border-hover: #cbd5e1;
+        --pf-text-main: #0f172a;
+        --pf-text-body: #334155;
+        --pf-text-muted: #64748b;
+        --pf-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+        --pf-shadow-md: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+        --pf-radius-lg: 1rem;
+        --pf-radius-xl: 1.25rem;
+    }
+
+    [data-bs-theme="dark"],
+    [data-theme="dark"] {
+        --pf-card-bg: #161922;
+        --pf-card-alt: #1e2230;
+        --pf-border: #252936;
+        --pf-border-hover: #374151;
+        --pf-text-main: #f8fafc;
+        --pf-text-body: #cbd5e1;
+        --pf-text-muted: #94a3b8;
+        --pf-brand-soft: rgba(254, 66, 77, 0.16);
+        --pf-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+        --pf-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.55);
+    }
+
+    .pf-dashboard-wrap {
+        max-width: 1120px;
+        margin: 2rem auto 4.5rem;
+        padding: 0 0.5rem;
+    }
+
+    /* Left Sidebar: User Identity Card */
+    .pf-sidebar-card {
+        background: var(--pf-card-bg);
+        border: 1.5px solid var(--pf-border);
+        border-radius: var(--pf-radius-xl);
+        padding: 2.25rem 1.75rem;
+        box-shadow: var(--pf-shadow-md);
+        text-align: center;
+        position: sticky;
+        top: 90px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pf-avatar-circle {
+        width: 108px;
+        height: 108px;
+        border-radius: 50%;
+        margin: 0 auto 1.25rem;
+        position: relative;
+        background: var(--pf-card-alt);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.75rem;
+        font-weight: 800;
+        color: #ffffff;
+        background: linear-gradient(135deg, #fe424d 0%, #ff5a5f 100%);
+        box-shadow: 0 6px 20px rgba(254, 66, 77, 0.35);
+        border: 3.5px solid var(--pf-card-bg);
+    }
+
+    .pf-avatar-circle img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .pf-verified-badge-icon {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        background: #10b981;
+        color: #ffffff;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.82rem;
+        border: 2.5px solid var(--pf-card-bg);
+        box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+    }
+
+    .pf-username {
+        color: var(--pf-text-main);
+        font-size: 1.55rem;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        margin-bottom: 0.35rem;
+    }
+
+    .pf-badge-role {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .pf-badge-admin {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fca5a5;
+    }
+
+    [data-bs-theme="dark"] .pf-badge-admin,
+    [data-theme="dark"] .pf-badge-admin {
+        background: #450a0a;
+        color: #fca5a5;
+        border-color: #7f1d1d;
+    }
+
+    .pf-badge-verified {
+        background: #ecfdf5;
+        color: #047857;
+        border: 1px solid #a7f3d0;
+    }
+
+    [data-bs-theme="dark"] .pf-badge-verified,
+    [data-theme="dark"] .pf-badge-verified {
+        background: #064e3b;
+        color: #6ee7b7;
+        border-color: #047857;
+    }
+
+    .pf-email-display {
+        color: var(--pf-text-muted);
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        cursor: pointer;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        transition: background-color 0.15s ease;
+    }
+
+    .pf-email-display:hover {
+        background-color: var(--pf-card-alt);
+        color: var(--pf-text-main);
+    }
+
+    .pf-joined-text {
+        color: var(--pf-text-muted);
+        font-size: 0.8rem;
+        margin-top: 0.35rem;
+    }
+
+    .pf-btn-edit-toggle {
+        background: linear-gradient(135deg, #fe424d 0%, #ff5a5f 100%);
+        color: #ffffff !important;
+        border: none;
+        border-radius: 999px;
+        padding: 0.65rem 1.45rem;
+        font-weight: 700;
+        font-size: 0.92rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        margin-top: 1.35rem;
+        box-shadow: 0 4px 14px rgba(254, 66, 77, 0.35);
+        transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.18s ease;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .pf-btn-edit-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(254, 66, 77, 0.5);
+    }
+
+    .pf-btn-edit-toggle:active {
+        transform: scale(0.98);
+    }
+
+    /* Right Main Content Cards */
+    .pf-main-card {
+        background: var(--pf-card-bg);
+        border: 1.5px solid var(--pf-border);
+        border-radius: var(--pf-radius-xl);
+        padding: 1.85rem;
+        box-shadow: var(--pf-shadow-md);
+        margin-bottom: 1.5rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .pf-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.35rem;
+        padding-bottom: 0.95rem;
+        border-bottom: 1px solid var(--pf-border);
+    }
+
+    .pf-card-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--pf-text-main);
+        margin-bottom: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    /* Stats Quick Row */
+    .pf-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .pf-stat-box {
+        background: var(--pf-card-bg);
+        border: 1.5px solid var(--pf-border);
+        border-radius: var(--pf-radius-lg);
+        padding: 1.15rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        text-decoration: none;
+        color: inherit;
+        box-shadow: var(--pf-shadow-sm);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .pf-stat-box:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--pf-shadow-md);
+        border-color: var(--pf-border-hover);
+    }
+
+    .pf-stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+    }
+
+    .pf-stat-num {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: var(--pf-text-main);
+        line-height: 1.15;
+    }
+
+    .pf-stat-desc {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: var(--pf-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.15rem;
+    }
+
+    /* Information Key-Value Tiles */
+    .pf-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.15rem;
+    }
+
+    .pf-info-item {
+        background: var(--pf-card-alt);
+        border: 1px solid var(--pf-border);
+        border-radius: var(--pf-radius-lg);
+        padding: 1.1rem 1.25rem;
+        transition: border-color 0.15s ease;
+    }
+
+    .pf-info-item:hover {
+        border-color: var(--pf-border-hover);
+    }
+
+    .pf-info-label {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: var(--pf-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .pf-info-val {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--pf-text-main);
+        word-break: normal;
+        overflow-wrap: break-word;
+    }
+
+    /* Trip Preview Items */
+    .pf-trip-row {
+        display: flex;
+        gap: 1.15rem;
+        padding: 1rem;
+        background: var(--pf-card-alt);
+        border: 1px solid var(--pf-border);
+        border-radius: var(--pf-radius-lg);
+        margin-bottom: 0.85rem;
+        transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .pf-trip-row:hover {
+        transform: translateY(-2px);
+        border-color: var(--pf-border-hover);
+    }
+
+    .pf-trip-thumb {
+        width: 120px;
+        height: 90px;
+        border-radius: 0.75rem;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    /* Form Inputs */
+    .pf-form-control {
+        border: 1.5px solid var(--pf-border);
+        border-radius: 0.75rem;
+        padding: 0.65rem 0.95rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--pf-text-main);
+        background-color: var(--pf-card-bg);
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .pf-form-control:focus {
+        border-color: var(--pf-brand);
+        box-shadow: 0 0 0 3px rgba(254, 66, 77, 0.12);
+        outline: none;
+        background-color: var(--pf-card-bg);
+        color: var(--pf-text-main);
+    }
+
+    /* Copy Toast */
+    .pf-copy-toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: #0f172a;
+        color: #ffffff;
+        padding: 0.75rem 1.35rem;
+        border-radius: 999px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        z-index: 9999;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .pf-copy-toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    @media (max-width: 992px) {
+        .pf-sidebar-card {
+            position: static;
+            margin-bottom: 1.5rem;
+        }
+        .pf-stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .pf-stat-grid {
+            grid-template-columns: 1fr;
+        }
+        .pf-info-grid {
+            grid-template-columns: 1fr;
+        }
+        .pf-trip-row {
+            flex-direction: column;
+        }
+        .pf-trip-thumb {
+            width: 100%;
+            height: 150px;
+        }
+    }
+</style>
+
+<div class="pf-dashboard-wrap">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: var(--pf-text-main); letter-spacing: -0.5px;">Account Profile</h2>
+            <div class="text-muted small">Manage your personal details, bookings, and security preferences.</div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="/bookings" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-semibold">
+                <i class="fa-solid fa-suitcase-rolling me-1"></i> My Trips
+            </a>
+            <a href="/wishlist" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fw-semibold">
+                <i class="fa-solid fa-heart me-1"></i> Wishlist
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN TWO-COLUMN LAYOUT -->
+    <div class="row g-4">
+        
+        <!-- ==============================================
+             LEFT COLUMN: USER SUMMARY CARD (~340px)
+             ============================================== -->
+        <div class="col-lg-4 col-xl-4">
+            <div class="pf-sidebar-card">
+                
+                <!-- AVATAR -->
+                <div class="pf-avatar-circle">
+                    <% if(user.avatar && user.avatar.length > 5) { %>
+                        <img src="<%= user.avatar %>" alt="<%= user.username %>" />
+                    <% } else { %>
+                        <%= (user.username || "U").charAt(0).toUpperCase() %>
+                    <% } %>
+                    <div class="pf-verified-badge-icon" title="Identity Verified">
+                        <i class="fa-solid fa-check"></i>
+                    </div>
+                </div>
+
+                <!-- USERNAME & ROLE -->
+                <div class="pf-username"><%= user.username %></div>
+                
+                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap mb-2">
+                    <% if(typeof isAdmin !== 'undefined' && isAdmin) { %>
+                        <span class="pf-badge-role pf-badge-admin"><i class="fa-solid fa-shield-halved"></i> Admin</span>
+                    <% } else { %>
+                        <span class="pf-badge-role pf-badge-verified"><i class="fa-solid fa-award"></i> Confirmed Guest</span>
+                    <% } %>
+
+                    <% if(user.authProvider === 'google') { %>
+                        <span class="pf-badge-role" style="background: rgba(234, 67, 53, 0.12); color: #dc2626; border: 1px solid rgba(234, 67, 53, 0.25);">
+                            <i class="fa-brands fa-google"></i> Google
+                        </span>
+                    <% } %>
+                </div>
+
+                <!-- EMAIL WITH 1-CLICK COPY -->
+                <div class="pf-email-display" onclick="copyUserEmail('<%= user.email %>')" title="Click to copy email">
+                    <i class="fa-regular fa-envelope text-muted"></i>
+                    <span><%= user.email %></span>
+                    <i class="fa-regular fa-copy small opacity-50 ms-1"></i>
+                </div>
+
+                <div class="pf-joined-text">
+                    <i class="fa-regular fa-calendar-check me-1"></i> Member since <%= (typeof stats !== 'undefined' && stats.memberSince) ? stats.memberSince : 'Aug 2026' %>
+                </div>
+
+                <!-- EDIT PROFILE TRIGGER BUTTON (OPENS INLINE EDITOR INSTANTLY) -->
+                <button type="button" class="pf-btn-edit-toggle" id="editProfileToggleBtn" onclick="toggleEditProfileView()">
+                    <i class="fa-solid fa-user-pen"></i>
+                    <span id="editBtnText">Edit Profile</span>
+                </button>
+
+                <div class="border-top mt-4 pt-3 text-start">
+                    <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">Trust & Verification</div>
+                    <div class="d-flex align-items-center justify-content-between py-1 text-muted small">
+                        <span><i class="fa-solid fa-shield-halved text-success me-2"></i> Identity Status</span>
+                        <span class="text-success fw-semibold">Verified</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between py-1 text-muted small">
+                        <span><i class="fa-regular fa-envelope text-primary me-2"></i> Email Address</span>
+                        <span class="text-success fw-semibold">Confirmed</span>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between py-1 text-muted small">
+                        <span><i class="fa-solid fa-lock text-warning me-2"></i> SSL 256-Bit Protection</span>
+                        <span class="text-success fw-semibold">Active</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==============================================
+             RIGHT COLUMN: STATS, DETAILS & INLINE EDITOR
+             ============================================== -->
+        <div class="col-lg-8 col-xl-8">
+            
+            <!-- 1. QUICK STATS ROW -->
+            <div class="pf-stat-grid">
+                
+                <a href="/bookings" class="pf-stat-box">
+                    <div class="pf-stat-icon" style="background: rgba(59, 130, 246, 0.12); color: #3b82f6;">
+                        <i class="fa-solid fa-suitcase-rolling"></i>
+                    </div>
+                    <div>
+                        <div class="pf-stat-num"><%= (typeof stats !== 'undefined' && stats.bookings) ? stats.bookings : 0 %></div>
+                        <div class="pf-stat-desc">Trips Booked</div>
+                    </div>
+                </a>
+
+                <a href="/wishlist" class="pf-stat-box">
+                    <div class="pf-stat-icon" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <div>
+                        <div class="pf-stat-num"><%= (typeof stats !== 'undefined' && stats.wishlist) ? stats.wishlist : 0 %></div>
+                        <div class="pf-stat-desc">Saved Stays</div>
+                    </div>
+                </a>
+
+                <div class="pf-stat-box">
+                    <div class="pf-stat-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+                    <div>
+                        <div class="pf-stat-num"><%= (typeof stats !== 'undefined' && stats.reviews) ? stats.reviews : 0 %></div>
+                        <div class="pf-stat-desc">Reviews Given</div>
+                    </div>
+                </div>
+
+                <div class="pf-stat-box">
+                    <div class="pf-stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <div>
+                        <div class="pf-stat-num">100%</div>
+                        <div class="pf-stat-desc">Account Trust</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 2. INLINE EDIT FORM (SHOWN WHEN "EDIT PROFILE" IS CLICKED) -->
+            <div class="pf-main-card d-none" id="inlineEditProfileSection" style="border-color: var(--pf-brand);">
+                <div class="pf-card-header">
+                    <div>
+                        <h4 class="pf-card-title text-danger">
+                            <i class="fa-solid fa-user-pen"></i> Edit Personal Details
+                        </h4>
+                        <div class="text-muted small mt-1">Update your name, contact, and address information.</div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="toggleEditProfileView()">
+                        <i class="fa-solid fa-xmark me-1"></i> Close
+                    </button>
+                </div>
+
+                <form action="/profile" method="POST" id="profileUpdateForm">
+                    <input type="hidden" name="_method" value="PUT" />
+                    
+                    <div class="row g-3">
+                        
+                        <!-- FULL NAME -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.76rem;">Full Name *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0"><i class="fa-regular fa-user text-muted"></i></span>
+                                <input name="username" type="text" class="form-control pf-form-control border-start-0" value="<%= user.username %>" required />
+                            </div>
+                        </div>
+
+                        <!-- MOBILE PHONE -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.76rem;">Mobile Phone</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-phone text-muted"></i></span>
+                                <input name="phone" type="text" class="form-control pf-form-control border-start-0" value="<%= user.phone || '' %>" placeholder="e.g. 9876543210" />
+                            </div>
+                        </div>
+
+                        <!-- DATE OF BIRTH -->
+                        <% const dobFormatted = user.dob ? new Date(user.dob).toISOString().split('T')[0] : ''; %>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.76rem;">Date of Birth</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-cake-candles text-muted"></i></span>
+                                <input name="dob" type="date" class="form-control pf-form-control border-start-0" value="<%= dobFormatted %>" />
+                            </div>
+                        </div>
+
+                        <!-- PIN CODE -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.76rem;">PIN / Postal Code</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-transparent border-end-0"><i class="fa-solid fa-map-pin text-muted"></i></span>
+                                <input name="pincode" type="text" class="form-control pf-form-control border-start-0" value="<%= user.pincode || '' %>" placeholder="e.g. 400001" />
+                            </div>
+                        </div>
+
+                        <!-- DISTRICT / CITY -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.76rem;">District / City</label>
+                            <input name="district" type="text" class="form-control pf-form-control" value="<%= user.district || '' %>" placeholder="e.g. Mumbai" />
+                        </div>
+
+                        <!-- STATE -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.76rem;">State</label>
+                            <input name="state" type="text" class="form-control pf-form-control" value="<%= user.state || '' %>" placeholder="e.g. Maharashtra" />
+                        </div>
+
+                        <!-- COUNTRY -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase" style="font-size: 0.76rem;">Country</label>
+                            <input name="country" type="text" class="form-control pf-form-control" value="<%= user.country || 'India' %>" />
+                        </div>
+
+                    </div>
+
+                    <!-- ACTION BUTTONS -->
+                    <div class="d-flex align-items-center justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" onclick="toggleEditProfileView()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-brand rounded-pill px-4 py-2 fw-semibold" id="submitProfileBtn">
+                            <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 3. PERSONAL DETAILS CARD (VIEW MODE) -->
+            <div class="pf-main-card" id="viewProfileDetailsSection">
+                <div class="pf-card-header">
+                    <div>
+                        <h4 class="pf-card-title">
+                            <i class="fa-solid fa-id-card text-danger"></i> Personal Information
+                        </h4>
+                        <div class="text-muted small mt-1">Your registered account details and verified identity info.</div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold" onclick="toggleEditProfileView()">
+                        <i class="fa-solid fa-pencil me-1"></i> Edit
+                    </button>
+                </div>
+
+                <div class="pf-info-grid">
+                    
+                    <!-- FULL NAME -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-regular fa-user text-danger"></i> Full Name</div>
+                        <div class="pf-info-val"><%= user.username %></div>
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-regular fa-envelope text-primary"></i> Email Address</div>
+                        <div class="pf-info-val text-truncate"><%= user.email %></div>
+                    </div>
+
+                    <!-- PHONE -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-solid fa-phone text-success"></i> Mobile Phone</div>
+                        <div class="pf-info-val">
+                            <%= (user.phone && user.phone.trim().length > 0) ? user.phone : 'Not provided' %>
+                        </div>
+                    </div>
+
+                    <!-- AGE / BIRTHDAY -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-solid fa-cake-candles text-warning"></i> Age & Birthday</div>
+                        <div class="pf-info-val">
+                            <% if(age !== null) { %>
+                                <%= age %> Years Old 
+                                <span class="text-muted small fw-normal ms-1">(<%= new Date(user.dob).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) %>)</span>
+                            <% } else { %>
+                                Not provided
+                            <% } %>
+                        </div>
+                    </div>
+
+                    <!-- PINCODE -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-solid fa-map-pin text-danger"></i> PIN / Postal Code</div>
+                        <div class="pf-info-val">
+                            <%= (user.pincode && user.pincode.trim().length > 0) ? user.pincode : 'Not provided' %>
+                        </div>
+                    </div>
+
+                    <!-- DISTRICT / CITY -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-solid fa-city text-info"></i> District / City</div>
+                        <div class="pf-info-val">
+                            <%= (user.district && user.district.trim().length > 0) ? user.district : 'Not provided' %>
+                        </div>
+                    </div>
+
+                    <!-- STATE -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-solid fa-map text-secondary"></i> State / Province</div>
+                        <div class="pf-info-val">
+                            <%= (user.state && user.state.trim().length > 0) ? user.state : 'Not provided' %>
+                        </div>
+                    </div>
+
+                    <!-- COUNTRY -->
+                    <div class="pf-info-item">
+                        <div class="pf-info-label"><i class="fa-solid fa-earth-asia text-primary"></i> Country</div>
+                        <div class="pf-info-val">
+                            <%= (user.country && user.country.trim().length > 0) ? user.country : 'India' %>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 4. RECENT TRIPS & STAYS -->
+            <div class="pf-main-card">
+                <div class="pf-card-header">
+                    <div>
+                        <h4 class="pf-card-title">
+                            <i class="fa-solid fa-clock-rotate-left text-primary"></i> Recent Trips
+                        </h4>
+                        <div class="text-muted small mt-1">Quick preview of your recent bookings and reservations.</div>
+                    </div>
+                    <a href="/bookings" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold">
+                        View All (<%= (typeof stats !== 'undefined' && stats.bookings) ? stats.bookings : 0 %>)
+                    </a>
+                </div>
+
+                <% if(typeof recentBookings !== 'undefined' && recentBookings && recentBookings.length > 0) { %>
+                    <% for(let booking of recentBookings) { %>
+                        <div class="pf-trip-row">
+                            <img 
+                                src="<%= (booking.listing && booking.listing.image && booking.listing.image.url) ? booking.listing.image.url : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80' %>" 
+                                alt="<%= (booking.listing && booking.listing.title) ? booking.listing.title : 'Stay' %>" 
+                                class="pf-trip-thumb" 
+                            />
+                            <div class="d-flex flex-column justify-content-between flex-grow-1">
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <h6 class="fw-bold mb-1" style="color: var(--pf-text-main);"><%= (booking.listing && booking.listing.title) ? booking.listing.title : 'Exclusive Stay' %></h6>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1 small">Confirmed</span>
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="fa-solid fa-location-dot me-1 text-danger"></i> 
+                                        <%= (booking.listing && booking.listing.location) ? booking.listing.location : 'India' %>
+                                    </div>
+                                    <div class="small mt-1 text-muted">
+                                        <i class="fa-regular fa-calendar me-1"></i>
+                                        <%= new Date(booking.checkIn).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) %> 
+                                        &rarr; 
+                                        <%= new Date(booking.checkOut).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %> 
+                                        (<%= booking.nights %> <%= booking.nights === 1 ? 'night' : 'nights' %>)
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
+                                    <span class="fw-bold text-danger fs-6">&#8377;<%= booking.totalPrice ? booking.totalPrice.toLocaleString('en-IN') : 0 %></span>
+                                    <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1">
+                                        View Details &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="text-center py-4">
+                        <div class="text-muted mb-2" style="font-size: 2.2rem;">
+                            <i class="fa-solid fa-compass"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1" style="color: var(--pf-text-main);">No Bookings Yet</h6>
+                        <p class="text-muted small mb-3">You haven't booked any trips yet. Explore trending destinations!</p>
+                        <a href="/listings" class="btn btn-sm btn-brand rounded-pill px-4 fw-semibold text-white">
+                            Explore Stays
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- 5. ACCOUNT & SECURITY SETTINGS -->
+            <div class="pf-main-card">
+                <div class="pf-card-header">
+                    <div>
+                        <h4 class="pf-card-title">
+                            <i class="fa-solid fa-shield-halved text-success"></i> Security & Preferences
+                        </h4>
+                        <div class="text-muted small mt-1">Manage password and display preferences.</div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 border" style="background: var(--pf-card-alt); border-color: var(--pf-border) !important;">
+                            <h6 class="fw-bold mb-1" style="color: var(--pf-text-main);"><i class="fa-solid fa-key text-primary me-2"></i> Password</h6>
+                            <p class="text-muted small mb-3">Update your password to keep your StayHub account secure.</p>
+                            <a href="/forgot-password" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                                Reset Password
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-4 border" style="background: var(--pf-card-alt); border-color: var(--pf-border) !important;">
+                            <h6 class="fw-bold mb-1" style="color: var(--pf-text-main);"><i class="fa-solid fa-circle-half-stroke text-warning me-2"></i> Theme Mode</h6>
+                            <p class="text-muted small mb-3">Switch between frosted Light mode and Obsidian Dark mode.</p>
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold" onclick="toggleStayHubTheme()">
+                                Toggle Theme
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- COPY TOAST NOTIFICATION -->
+<div id="copyToastNotification" class="pf-copy-toast">
+    <i class="fa-solid fa-circle-check text-success"></i>
+    <span>Email copied to clipboard!</span>
+</div>
+
+<script>
+    // Toggle Inline Edit Profile Form (100% Reliability — NO MODAL / NO FREEZING)
+    function toggleEditProfileView() {
+        const editSection = document.getElementById('inlineEditProfileSection');
+        const viewSection = document.getElementById('viewProfileDetailsSection');
+        const btnText = document.getElementById('editBtnText');
+        
+        if (!editSection) return;
+
+        if (editSection.classList.contains('d-none')) {
+            editSection.classList.remove('d-none');
+            editSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (btnText) btnText.textContent = "Cancel Edit";
+        } else {
+            editSection.classList.add('d-none');
+            if (btnText) btnText.textContent = "Edit Profile";
+        }
+    }
+
+    // 1-Click Copy Email Functionality
+    function copyUserEmail(email) {
+        if (!navigator.clipboard) return;
+        navigator.clipboard.writeText(email).then(() => {
+            const toast = document.getElementById('copyToastNotification');
+            if (toast) {
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2200);
+            }
+        });
+    }
+
+    // Form Submission Feedback
+    const profileForm = document.getElementById('profileUpdateForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', () => {
+            const submitBtn = document.getElementById('submitProfileBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving Changes...';
+            }
+        });
+    }
+</script>

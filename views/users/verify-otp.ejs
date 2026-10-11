@@ -1,0 +1,142 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="auth-wrapper">
+    <div class="auth-card otp-card shadow-lg p-4 p-md-5">
+        <!-- Animated Badge Icon -->
+        <div class="otp-icon-badge">
+            <i class="fa-solid fa-envelope-open-text"></i>
+        </div>
+
+        <h1 class="fw-bold mb-2">Check your email</h1>
+        <p class="auth-subtitle mb-3 text-muted">
+            We sent a 6-digit verification code to<br/>
+            <strong class="text-dark d-inline-block mt-1 px-2 py-1 bg-light rounded-pill border" style="font-size: 0.95rem;">
+                <%= email %>
+            </strong>
+        </p>
+
+        <!-- OTP Input Form -->
+        <form action="/verify-otp" method="POST" id="otpForm" class="mt-3">
+            <input type="hidden" name="otp" id="fullOtp" />
+
+            <!-- 6 Digit Segmented Inputs -->
+            <div class="otp-inputs">
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" autocomplete="one-time-code" autofocus required />
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+                <input type="text" class="otp-digit" maxlength="1" pattern="[0-9]" inputmode="numeric" required />
+            </div>
+
+            <div class="d-grid mt-4">
+                <button type="submit" class="btn btn-brand py-2 fw-semibold rounded-pill" id="verifyBtn">
+                    <span>Verify & Create Account</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Resend OTP Section with Countdown -->
+        <div class="mt-4 pt-3 border-top text-center">
+            <p class="text-muted small mb-2">Didn't receive the email? Check your Spam folder or resend.</p>
+            
+            <form action="/resend-otp" method="POST" id="resendForm" class="d-inline">
+                <button type="submit" class="btn btn-link text-decoration-none p-0 fw-semibold" id="resendBtn" style="color: var(--brand); font-size: 0.9rem;" disabled>
+                    <span id="resendTimerText">Resend code in <b id="countdown">45</b>s</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="mt-3 text-center">
+            <a href="/signup" class="text-muted small text-decoration-none">
+                <i class="fa-solid fa-arrow-left me-1"></i> Change email address
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. Multi-digit OTP Input Behavior
+    const digits = document.querySelectorAll(".otp-digit");
+    const fullOtpInput = document.getElementById("fullOtp");
+    const otpForm = document.getElementById("otpForm");
+    const verifyBtn = document.getElementById("verifyBtn");
+
+    digits.forEach((input, index) => {
+        // Auto-advance on input
+        input.addEventListener("input", (e) => {
+            const val = e.target.value.replace(/[^0-9]/g, "");
+            e.target.value = val;
+
+            if (val && index < digits.length - 1) {
+                digits[index + 1].focus();
+            }
+            updateFullOtp();
+        });
+
+        // Handle Backspace navigation
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && !input.value && index > 0) {
+                digits[index - 1].focus();
+            }
+        });
+
+        // Paste support: paste full 6-digit code
+        input.addEventListener("paste", (e) => {
+            e.preventDefault();
+            const pasteData = (e.clipboardData || window.clipboardData).getData("text").trim();
+            const numbers = pasteData.replace(/[^0-9]/g, "").slice(0, 6);
+            if (numbers.length > 0) {
+                numbers.split("").forEach((char, i) => {
+                    if (digits[i]) digits[i].value = char;
+                });
+                const nextIndex = Math.min(numbers.length, digits.length - 1);
+                digits[nextIndex].focus();
+                updateFullOtp();
+
+                // If complete 6 digits pasted, auto-submit
+                if (numbers.length === 6) {
+                    setTimeout(() => otpForm.requestSubmit(), 200);
+                }
+            }
+        });
+    });
+
+    function updateFullOtp() {
+        let code = "";
+        digits.forEach(d => code += d.value);
+        fullOtpInput.value = code;
+    }
+
+    otpForm.addEventListener("submit", (e) => {
+        updateFullOtp();
+        if (fullOtpInput.value.length !== 6) {
+            e.preventDefault();
+            if (typeof showToast === "function") {
+                showToast("Please enter all 6 digits of the verification code.", "warning");
+            }
+            return;
+        }
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Verifying...';
+    });
+
+    // 2. Countdown Timer for Resend Button
+    let timeLeft = 45;
+    const countdownEl = document.getElementById("countdown");
+    const resendBtn = document.getElementById("resendBtn");
+    const resendTimerText = document.getElementById("resendTimerText");
+
+    const timer = setInterval(() => {
+        timeLeft--;
+        if (countdownEl) countdownEl.textContent = timeLeft;
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            if (resendBtn && resendTimerText) {
+                resendBtn.disabled = false;
+                resendTimerText.innerHTML = '<i class="fa-solid fa-arrow-rotate-right me-1"></i> Resend Verification Code';
+            }
+        }
+    }, 1000);
+</script>

@@ -25,6 +25,8 @@ module.exports.listingSchema = Joi.object({
             .required(),
 
         image: Joi.string().allow("", null),
+        maxGuests: Joi.number().min(1).allow(null),
+        amenities: Joi.alternatives().try(Joi.array().items(Joi.string()), Joi.string()).allow(null),
     }).required(),
 });
 

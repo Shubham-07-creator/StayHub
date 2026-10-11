@@ -1,204 +1,677 @@
 <% layout("/layouts/boilerplate") %>
 
-<h3 class="mt-3 mb-4">My Trips</h3>
+<style>
+    :root {
+        --trip-brand: #fe424d;
+        --trip-brand-dark: #e02f3a;
+        --trip-card-bg: #ffffff;
+        --trip-card-subtle: #f8fafc;
+        --trip-text: #1e293b;
+        --trip-muted: #64748b;
+        --trip-border: #e2e8f0;
+        --trip-radius: 1.15rem;
+        --trip-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        --trip-shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
 
-<% if (bookings.length === 0) { %>
-    <p>
-        You have no bookings yet.
-        <a
-            href="/listings"
-            style="color: var(--brand); font-weight: 600;"
-        >
-            Explore stays
-        </a>
-    </p>
-<% } %>
+    [data-bs-theme="dark"],
+    [data-theme="dark"] {
+        --trip-card-bg: #161922;
+        --trip-card-subtle: #1e2230;
+        --trip-text: #f3f4f6;
+        --trip-muted: #9ca3af;
+        --trip-border: #252936;
+        --trip-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+        --trip-shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.5);
+    }
 
-<div class="row row-cols-1 row-cols-md-3 g-4">
+    /* HEADER */
+    .trip-page-header {
+        margin-top: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .trip-page-title {
+        font-size: clamp(1.75rem, 3.5vw, 2.4rem);
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: var(--trip-text);
+        margin-bottom: 0.35rem;
+    }
+    .trip-page-subtitle {
+        color: var(--trip-muted);
+        font-size: 0.98rem;
+        margin-bottom: 1.25rem;
+    }
 
-    <% for (booking of bookings) { %>
+    /* FILTER TABS */
+    .trip-filter-nav {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        border-bottom: 1px solid var(--trip-border);
+        padding-bottom: 0.75rem;
+        margin-bottom: 2rem;
+    }
+    .trip-filter-pill {
+        background: transparent;
+        border: 1px solid var(--trip-border);
+        color: var(--trip-muted);
+        padding: 0.45rem 1.15rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .trip-filter-pill:hover {
+        background: var(--trip-card-subtle);
+        color: var(--trip-text);
+        border-color: var(--trip-brand);
+        transform: translateY(-2px);
+    }
+    .trip-filter-pill:active {
+        transform: scale(0.95);
+    }
+    .trip-filter-pill.active {
+        background: var(--trip-brand);
+        color: #ffffff;
+        border-color: var(--trip-brand);
+        box-shadow: 0 4px 12px rgba(254, 66, 77, 0.3);
+    }
+    .trip-count-badge {
+        font-size: 0.72rem;
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.12);
+        transition: transform 0.15s ease;
+    }
+    .trip-filter-pill.active .trip-count-badge {
+        background: rgba(255, 255, 255, 0.25);
+        color: #ffffff;
+    }
 
-        <% if (booking.listing) { %>
+    /* TRIP CARD */
+    .trip-card-item {
+        background: var(--trip-card-bg);
+        border: 1px solid var(--trip-border);
+        border-radius: var(--trip-radius);
+        overflow: hidden;
+        box-shadow: var(--trip-shadow);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.25s ease;
+        margin-bottom: 1.5rem;
+        animation: cardRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .trip-card-item:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--trip-shadow-hover);
+        border-color: var(--trip-brand);
+    }
+    .trip-card-item:active {
+        transform: translateY(-3px) scale(0.99);
+    }
 
-            <div class="col">
+    /* Staggered entrance animation for bookings list */
+    #tripsContainer > div:nth-child(1) { animation-delay: 0.04s; }
+    #tripsContainer > div:nth-child(2) { animation-delay: 0.08s; }
+    #tripsContainer > div:nth-child(3) { animation-delay: 0.12s; }
+    #tripsContainer > div:nth-child(4) { animation-delay: 0.16s; }
+    #tripsContainer > div:nth-child(5) { animation-delay: 0.20s; }
+    #tripsContainer > div:nth-child(6) { animation-delay: 0.24s; }
 
-                <div
-                    class="card trip-card h-100"
-                    style="
-                        overflow: hidden !important;
-                        border-radius: 18px !important;
-                    "
-                >
+    /* CARD COVER PHOTO WITH SHIMMER SWEEP */
+    .trip-cover-wrap {
+        position: relative;
+        height: 100%;
+        min-height: 220px;
+        background: #000;
+        overflow: hidden;
+    }
+    .trip-cover-wrap::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+        transform: translateX(-150%) skewX(-25deg);
+        z-index: 3;
+        pointer-events: none;
+    }
+    .trip-card-item:hover .trip-cover-wrap::before {
+        animation: cardShimmerSweep 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .trip-cover-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .trip-card-item:hover .trip-cover-img {
+        transform: scale(1.07);
+    }
 
-                    <!-- IMAGE -->
-                    <img
-                        src="<%= booking.listing.image.url %>"
-                        class="card-img-top"
-                        alt="Listing Image"
-                        style="
-                            height: 200px !important;
-                            object-fit: cover !important;
-                            border-radius: 0 !important;
-                            display: block;
-                            width: 100%;
-                        "
-                    >
+    /* BADGES */
+    .trip-badge-status {
+        position: absolute;
+        top: 0.85rem;
+        left: 0.85rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        z-index: 2;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .trip-status-upcoming {
+        background: #10b981;
+        color: #ffffff;
+    }
+    .trip-status-completed {
+        background: #3b82f6;
+        color: #ffffff;
+    }
+    .trip-status-cancelled {
+        background: #ef4444;
+        color: #ffffff;
+    }
 
-                    <!-- CARD BODY -->
-                    <div
-                        class="card-body"
-                        style="
-                            padding: 20px 20px 24px 20px !important;
-                        "
-                    >
+    .trip-inv-chip {
+        position: absolute;
+        bottom: 0.85rem;
+        left: 0.85rem;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(6px);
+        color: #f1f5f9;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        z-index: 2;
+        letter-spacing: 0.5px;
+    }
 
-                        <!-- CONTENT WRAPPER -->
-                        <div
-                            style="
-                                margin-left: 18px !important;
-                                margin-right: 5px !important;
-                            "
-                        >
+    /* CARD BODY CONTENT */
+    .trip-content-box {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+    .trip-title-link {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--trip-text);
+        text-decoration: none;
+        margin-bottom: 0.35rem;
+        display: inline-block;
+        transition: color 0.15s ease;
+    }
+    .trip-title-link:hover {
+        color: var(--trip-brand);
+    }
+    .trip-location-line {
+        color: var(--trip-muted);
+        font-size: 0.88rem;
+        margin-bottom: 1rem;
+    }
 
-                            <!-- TITLE -->
-                            <h5
-                                class="card-title"
-                                style="
-                                    margin: 0 0 14px 0 !important;
-                                    padding: 0 !important;
-                                    font-size: 25px;
-                                    font-weight: 500;
-                                "
-                            >
-                                <%= booking.listing.title %>
-                            </h5>
+    /* TIMELINE PILL */
+    .trip-timeline-box {
+        background: var(--trip-card-subtle);
+        border: 1px solid var(--trip-border);
+        border-radius: 0.75rem;
+        padding: 0.85rem 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+    .trip-date-col strong {
+        display: block;
+        font-size: 0.92rem;
+        color: var(--trip-text);
+    }
+    .trip-date-col span {
+        font-size: 0.74rem;
+        color: var(--trip-muted);
+        text-transform: uppercase;
+        font-weight: 600;
+    }
 
-                            <!-- CHECK IN -->
-                            <p
-                                class="card-text"
-                                style="
-                                    margin: 0 0 7px 0 !important;
-                                    padding: 0 !important;
-                                "
-                            >
-                                <b>Check-in:</b>
-                                <%= booking.checkIn.toDateString() %>
-                            </p>
+    /* FINANCIAL ROW */
+    .trip-finance-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--trip-border);
+        margin-bottom: 1.25rem;
+    }
+    .trip-price-val {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: var(--trip-text);
+    }
 
-                            <!-- CHECK OUT -->
-                            <p
-                                class="card-text"
-                                style="
-                                    margin: 0 0 7px 0 !important;
-                                    padding: 0 !important;
-                                "
-                            >
-                                <b>Check-out:</b>
-                                <%= booking.checkOut.toDateString() %>
-                            </p>
+    /* BUTTONS */
+    .trip-btn-invoice {
+        background: #0f172a;
+        color: #ffffff !important;
+        border: none;
+        border-radius: 999px;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+                    background-color 0.15s ease,
+                    box-shadow 0.18s ease;
+    }
+    .trip-btn-invoice:hover {
+        background: #1e293b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    .trip-btn-invoice:active {
+        transform: scale(0.96);
+    }
+    .trip-btn-invoice i {
+        transition: transform 0.2s ease;
+    }
+    .trip-btn-invoice:hover i {
+        transform: scale(1.15);
+    }
+    [data-bs-theme="dark"] .trip-btn-invoice,
+    [data-theme="dark"] .trip-btn-invoice {
+        background: #334155;
+    }
+    [data-bs-theme="dark"] .trip-btn-invoice:hover,
+    [data-theme="dark"] .trip-btn-invoice:hover {
+        background: #475569;
+    }
 
-                            <!-- GUESTS -->
-                            <p
-                                class="card-text"
-                                style="
-                                    margin: 0 0 7px 0 !important;
-                                    padding: 0 !important;
-                                "
-                            >
-                                <b>Guests:</b>
-                                <%= booking.guests %>
-                            </p>
+    .trip-btn-view {
+        background: transparent;
+        border: 1.5px solid var(--trip-brand);
+        color: var(--trip-brand) !important;
+        border-radius: 999px;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .trip-btn-view:hover {
+        background: var(--trip-brand);
+        color: #ffffff !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(254, 66, 77, 0.25);
+    }
+    .trip-btn-view:active {
+        transform: scale(0.96);
+    }
 
-                            <!-- TOTAL -->
-                            <p
-                                class="card-text"
-                                style="
-                                    margin: 0 0 14px 0 !important;
-                                    padding: 0 !important;
-                                "
-                            >
-                                <b>Total:</b>
-                                &#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
-                            </p>
+    .trip-btn-cancel {
+        background: transparent;
+        border: 1px solid #ef4444;
+        color: #ef4444;
+        border-radius: 999px;
+        padding: 0.5rem 1.25rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .trip-btn-cancel:hover {
+        background: #fef2f2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    }
+    .trip-btn-cancel:active {
+        transform: scale(0.96);
+    }
+    .trip-btn-cancel:hover {
+        background: #ef4444;
+        color: #ffffff;
+    }
 
-                            <!-- STATUS -->
-                            <p
-                                class="card-text"
-                                style="
-                                    margin: 0 0 16px 0 !important;
-                                    padding: 0 !important;
-                                "
-                            >
-                                <span
-                                    class="status-badge <%= booking.status === 'cancelled' ? 'status-cancelled' : 'status-confirmed' %>"
-                                    style="
-                                        display: inline-block;
-                                        padding: 7px 18px !important;
-                                        border-radius: 20px !important;
-                                    "
-                                >
-                                    <%= booking.status %>
-                                </span>
-                            </p>
+    /* EMPTY STATE */
+    .trip-empty-state {
+        text-align: center;
+        padding: 4rem 1.5rem;
+        background: var(--trip-card-bg);
+        border: 1px solid var(--trip-border);
+        border-radius: var(--trip-radius);
+        margin: 1.5rem 0;
+    }
+    .trip-empty-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(254, 66, 77, 0.1);
+        color: var(--trip-brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        margin: 0 auto 1.5rem auto;
+    }
+</style>
 
-                            <!-- BUTTONS -->
-                            <div
-                                class="d-flex gap-2 flex-wrap"
-                                style="
-                                    margin: 0 !important;
-                                    padding: 0 !important;
-                                "
-                            >
+<div class="container py-3">
 
-                                <!-- VIEW LISTING -->
-                                <a
-                                    href="/listings/<%= booking.listing._id %>"
-                                    class="btn btn-brand-outline btn-sm"
-                                    style="
-                                        padding: 8px 18px !important;
-                                        border-radius: 20px !important;
-                                    "
-                                >
-                                    View Listing
-                                </a>
+    <!-- PAGE HEADER -->
+    <div class="trip-page-header">
+        <h1 class="trip-page-title">
+            <i class="fa-solid fa-suitcase-rolling text-danger me-2"></i>My Trips & Reservations
+        </h1>
+        <p class="trip-page-subtitle">
+            Manage your booked stays, check itinerary dates, and download official Indian GST Tax Invoices.
+        </p>
 
-                                <!-- CANCEL -->
-                                <% if (booking.status !== 'cancelled') { %>
+        <% 
+            const now = new Date();
+            let upcomingCount = 0;
+            let completedCount = 0;
+            let cancelledCount = 0;
 
-                                    <form
-                                        method="POST"
-                                        action="/bookings/<%= booking._id %>?_method=DELETE"
-                                        style="
-                                            margin: 0 !important;
-                                            padding: 0 !important;
-                                        "
-                                    >
-                                        <button
-                                            type="submit"
-                                            class="btn btn-dark-outline btn-sm"
-                                            style="
-                                                padding: 8px 18px !important;
-                                                border-radius: 20px !important;
-                                            "
-                                        >
-                                            Cancel
-                                        </button>
-                                    </form>
+            bookings.forEach(b => {
+                if (b.status === 'cancelled') {
+                    cancelledCount++;
+                } else if (new Date(b.checkOut) >= now) {
+                    upcomingCount++;
+                } else {
+                    completedCount++;
+                }
+            });
+        %>
 
-                                <% } %>
+        <!-- INTERACTIVE FILTER TABS -->
+        <div class="trip-filter-nav">
+            <button type="button" class="trip-filter-pill active" onclick="filterTrips('all', this)">
+                <i class="fa-solid fa-layer-group"></i> All Trips
+                <span class="trip-count-badge"><%= bookings.length %></span>
+            </button>
+            <button type="button" class="trip-filter-pill" onclick="filterTrips('upcoming', this)">
+                <i class="fa-solid fa-calendar-check text-success"></i> Upcoming
+                <span class="trip-count-badge"><%= upcomingCount %></span>
+            </button>
+            <button type="button" class="trip-filter-pill" onclick="filterTrips('completed', this)">
+                <i class="fa-solid fa-circle-check text-primary"></i> Completed
+                <span class="trip-count-badge"><%= completedCount %></span>
+            </button>
+            <button type="button" class="trip-filter-pill" onclick="filterTrips('cancelled', this)">
+                <i class="fa-solid fa-circle-xmark text-danger"></i> Cancelled
+                <span class="trip-count-badge"><%= cancelledCount %></span>
+            </button>
+        </div>
+    </div>
 
+    <!-- BOOKINGS LIST -->
+    <% if (bookings.length === 0) { %>
+        <!-- EMPTY STATE (NO BOOKINGS AT ALL) -->
+        <div class="trip-empty-state">
+            <div class="trip-empty-icon">
+                <i class="fa-solid fa-compass"></i>
+            </div>
+            <h3 class="fw-bold mb-2">No trips booked... yet!</h3>
+            <p class="text-muted small mb-4" style="max-width: 480px; margin: 0 auto;">
+                Time to dust off your bags and start planning your next great adventure. Explore beachfront villas, cozy mountain cabins, and heritage castles across India.
+            </p>
+            <a href="/listings" class="btn btn-brand rounded-pill px-4 py-2 fw-bold shadow-sm">
+                <i class="fa-solid fa-magnifying-glass me-1"></i> Start Exploring Stays
+            </a>
+        </div>
+    <% } else { %>
+
+        <div id="tripsContainer">
+            <% for (let booking of bookings) { %>
+                <% if (booking.listing) { %>
+                    <% 
+                        const isCancelled = (booking.status === 'cancelled');
+                        const isUpcoming = (!isCancelled && new Date(booking.checkOut) >= now);
+                        const isCompleted = (!isCancelled && new Date(booking.checkOut) < now);
+                        
+                        let tripCategory = 'completed';
+                        if (isCancelled) tripCategory = 'cancelled';
+                        else if (isUpcoming) tripCategory = 'upcoming';
+
+                        // Days until check-in
+                        const checkInDate = new Date(booking.checkIn);
+                        const checkOutDate = new Date(booking.checkOut);
+                        const diffDays = Math.ceil((checkInDate - now) / (1000 * 60 * 60 * 24));
+                    %>
+
+                    <div class="trip-card-item trip-item-row" data-category="<%= tripCategory %>">
+                        <div class="row g-0 align-items-stretch">
+                            <!-- LEFT: PHOTO -->
+                            <div class="col-12 col-md-4 col-lg-3">
+                                <div class="trip-cover-wrap skeleton-box">
+                                    <% if (isCancelled) { %>
+                                        <span class="trip-badge-status trip-status-cancelled">
+                                            <i class="fa-solid fa-circle-xmark me-1"></i> Cancelled
+                                        </span>
+                                    <% } else if (isUpcoming) { %>
+                                        <span class="trip-badge-status trip-status-upcoming">
+                                            <span class="pulse-beacon"></span>
+                                            <%= diffDays <= 0 ? 'Today / Active' : `In ${diffDays} day${diffDays > 1 ? 's' : ''}` %>
+                                        </span>
+                                    <% } else { %>
+                                        <span class="trip-badge-status trip-status-completed">
+                                            <i class="fa-solid fa-circle-check me-1"></i> Completed Stay
+                                        </span>
+                                    <% } %>
+
+                                    <img
+                                        src="<%= booking.listing.image.url %>"
+                                        class="trip-cover-img"
+                                        alt="<%= booking.listing.title %>"
+                                        loading="lazy"
+                                        onload="this.parentElement.classList.remove('skeleton-box')"
+                                    />
+
+                                    <span class="trip-inv-chip">
+                                        <i class="fa-solid fa-receipt me-1"></i>
+                                        <%= booking.invoiceNumber || ('#SH-' + booking._id.toString().slice(-6).toUpperCase()) %>
+                                    </span>
+                                </div>
                             </div>
 
+                            <!-- RIGHT: CONTENT -->
+                            <div class="col-12 col-md-8 col-lg-9">
+                                <div class="trip-content-box">
+                                    <div>
+                                        <!-- TITLE & LOCATION -->
+                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1">
+                                            <a href="/listings/<%= booking.listing._id %>" class="trip-title-link">
+                                                <%= booking.listing.title %>
+                                            </a>
+                                            <span class="badge bg-secondary-subtle text-secondary small">
+                                                <%= booking.listing.category ? booking.listing.category.toUpperCase() : 'HOMESTAY' %>
+                                            </span>
+                                        </div>
+
+                                        <p class="trip-location-line">
+                                            <i class="fa-solid fa-location-dot text-danger me-1"></i>
+                                            <%= booking.listing.location %>, <%= booking.listing.country %>
+                                        </p>
+
+                                        <!-- DATES & GUESTS TIMELINE -->
+                                        <div class="trip-timeline-box">
+                                            <div class="trip-date-col">
+                                                <span>Check-in</span>
+                                                <strong>
+                                                    <i class="fa-regular fa-calendar me-1 text-danger"></i>
+                                                    <%= checkInDate.toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                                                </strong>
+                                                <small class="text-muted" style="font-size: 0.72rem;">From 2:00 PM</small>
+                                            </div>
+
+                                            <div class="text-muted fs-5 d-none d-sm-block">
+                                                <i class="fa-solid fa-arrow-right-long text-danger"></i>
+                                            </div>
+
+                                            <div class="trip-date-col">
+                                                <span>Check-out</span>
+                                                <strong>
+                                                    <i class="fa-regular fa-calendar me-1 text-danger"></i>
+                                                    <%= checkOutDate.toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                                                </strong>
+                                                <small class="text-muted" style="font-size: 0.72rem;">By 11:00 AM</small>
+                                            </div>
+
+                                            <div class="trip-date-col">
+                                                <span>Stay Duration</span>
+                                                <strong>
+                                                    <%= booking.nights %> night<%= booking.nights > 1 ? 's' : '' %> &bull; <%= booking.guests %> guest<%= booking.guests > 1 ? 's' : '' %>
+                                                </strong>
+                                                <small class="text-muted" style="font-size: 0.72rem;">Entire Property</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- FINANCE & ACTIONS -->
+                                    <div>
+                                        <div class="trip-finance-row">
+                                            <div>
+                                                <span class="text-muted small d-block">Total Paid:</span>
+                                                <div class="d-flex align-items-baseline gap-2">
+                                                    <span class="trip-price-val">&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span>
+                                                    <span class="badge bg-success-subtle text-success border border-success-subtle" style="font-size: 0.72rem;">
+                                                        <i class="fa-solid fa-circle-check me-1"></i>incl. <%= booking.gstRate || 12 %>% GST
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div class="small text-muted">
+                                                <span class="d-block" style="font-size: 0.72rem;">Payment Reference:</span>
+                                                <code class="text-dark"><%= booking.razorpayPaymentId || 'PAY-ONLINE-VERIFIED' %></code>
+                                            </div>
+                                        </div>
+
+                                        <!-- ACTION BUTTONS -->
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <!-- TAX INVOICE -->
+                                                <a href="/bookings/<%= booking._id %>" class="trip-btn-invoice" title="View official GST invoice & booking voucher">
+                                                    <i class="fa-solid fa-file-invoice-dollar"></i> Tax Invoice & Voucher
+                                                </a>
+
+                                                <!-- VIEW STAY -->
+                                                <a href="/listings/<%= booking.listing._id %>" class="trip-btn-view">
+                                                    <i class="fa-solid fa-house"></i> View Stay
+                                                </a>
+
+                                                <!-- WRITE A REVIEW (IF STAY COMPLETED) -->
+                                                <% if (isCompleted) { %>
+                                                <a href="/listings/<%= booking.listing._id %>#reviewsSection" class="btn btn-sm btn-outline-warning rounded-pill px-3 fw-semibold text-dark">
+                                                    <i class="fa-solid fa-star text-warning me-1"></i> Leave Review
+                                                </a>
+                                                <% } %>
+                                            </div>
+
+                                            <!-- CANCEL BUTTON OR STATUS -->
+                                            <% if (isCancelled) { %>
+                                            <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill small">
+                                                <i class="fa-solid fa-arrow-rotate-left me-1"></i> Refund Initiated
+                                            </span>
+                                            <% } else if (isUpcoming) { %>
+                                            <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE"
+                                                  data-confirm="Are you sure you want to cancel this booking? A 100% refund will be automatically initiated to your original payment method."
+                                                  data-confirm-title="Cancel Reservation?"
+                                                  data-confirm-btn="Yes, Cancel Booking"
+                                                  data-confirm-cancel="Keep Booking"
+                                                  data-confirm-type="danger"
+                                                  data-confirm-icon="fa-ban">
+                                                <button type="submit" class="trip-btn-cancel">
+                                                    <i class="fa-solid fa-ban"></i> Cancel Booking
+                                                </button>
+                                            </form>
+                                            <% } else { %>
+                                            <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill small">
+                                                <i class="fa-solid fa-circle-check me-1 text-primary"></i> Stay Completed
+                                            </span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
                         </div>
-
                     </div>
+                <% } %>
+            <% } %>
 
+            <!-- NO MATCHING FILTER RESULTS (HIDDEN BY DEFAULT) -->
+            <div id="noFilterMatch" class="trip-empty-state d-none">
+                <div class="trip-empty-icon">
+                    <i class="fa-solid fa-filter"></i>
                 </div>
-
+                <h4 class="fw-bold mb-2">No trips found in this tab</h4>
+                <p class="text-muted small mb-3">You don't have any reservations matching this filter.</p>
+                <button type="button" class="btn btn-outline-dark rounded-pill px-4" onclick="filterTrips('all', document.querySelector('.trip-filter-pill'))">
+                    Show All Trips
+                </button>
             </div>
-
-        <% } %>
+        </div>
 
     <% } %>
 
 </div>
+
+<!-- JAVASCRIPT FILTERING LOGIC -->
+<script>
+    function filterTrips(category, btn) {
+        // 1. Update active tab pill
+        document.querySelectorAll(".trip-filter-pill").forEach(p => p.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+
+        // 2. Filter card items
+        const items = document.querySelectorAll(".trip-item-row");
+        const noMatchBox = document.getElementById("noFilterMatch");
+        let visibleCount = 0;
+
+        items.forEach(item => {
+            const itemCat = item.getAttribute("data-category");
+            if (category === "all" || itemCat === category) {
+                item.classList.remove("d-none");
+                item.style.animation = "pageReveal 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards";
+                visibleCount++;
+            } else {
+                item.classList.add("d-none");
+            }
+        });
+
+        // 3. Toggle empty state for tab
+        if (noMatchBox) {
+            if (visibleCount === 0 && items.length > 0) {
+                noMatchBox.classList.remove("d-none");
+            } else {
+                noMatchBox.classList.add("d-none");
+            }
+        }
+    }
+</script>

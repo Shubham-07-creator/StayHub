@@ -21,12 +21,18 @@
                         </p>
                         <p class="mb-1"><b>Guests:</b> <%= booking.guests %></p>
                         <p class="mb-0">
-                            <b>Total:</b> &#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
+                            <b>Total Received:</b> &#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size: 0.72rem;">Paid via Razorpay</span>
                         </p>
                     </div>
-                    <span class="status-badge <%= booking.status === 'cancelled' ? 'status-cancelled' : 'status-confirmed' %>">
-                        <%= booking.status %>
-                    </span>
+                    <div class="d-flex align-items-center gap-2 mt-2 mt-sm-0">
+                        <a href="/bookings/<%= booking._id %>" class="btn btn-sm btn-outline-secondary rounded-pill">
+                            <i class="fa-solid fa-receipt me-1"></i> Tax Invoice
+                        </a>
+                        <span class="status-badge <%= booking.status === 'cancelled' ? 'status-cancelled' : 'status-confirmed' %>">
+                            <%= booking.status === 'confirmed' ? 'Confirmed' : 'Cancelled' %>
+                        </span>
+                    </div>
                 </div>
             </div>
             <% } %>

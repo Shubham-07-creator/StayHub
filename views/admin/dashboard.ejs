@@ -1,0 +1,496 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+    .stat-card-rev {
+        background: linear-gradient(135deg, #fff1f1, #ffffff);
+        border-left: 5px solid var(--brand) !important;
+    }
+    .stat-card-fee {
+        background: linear-gradient(135deg, #f0f9ff, #ffffff);
+        border-left: 5px solid #0284c7 !important;
+    }
+    .stat-card-book {
+        background: linear-gradient(135deg, #f0fdf4, #ffffff);
+        border-left: 5px solid #16a34a !important;
+    }
+    .stat-card-inv {
+        background: linear-gradient(135deg, #faf5ff, #ffffff);
+        border-left: 5px solid #9333ea !important;
+    }
+    .card {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.25s ease !important;
+        animation: cardRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12) !important;
+    }
+    .card:active {
+        transform: translateY(-2px) scale(0.99);
+    }
+    .card:hover .rounded-circle {
+        transform: scale(1.15) rotate(8deg);
+    }
+    .rounded-circle {
+        transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    [data-bs-theme="dark"] .stat-card-rev, [data-theme="dark"] .stat-card-rev {
+        background: linear-gradient(135deg, #2b1719, #1e1e26) !important;
+    }
+    [data-bs-theme="dark"] .stat-card-fee, [data-theme="dark"] .stat-card-fee {
+        background: linear-gradient(135deg, #10212e, #1e1e26) !important;
+    }
+    [data-bs-theme="dark"] .stat-card-book, [data-theme="dark"] .stat-card-book {
+        background: linear-gradient(135deg, #11261a, #1e1e26) !important;
+    }
+    [data-bs-theme="dark"] .stat-card-inv, [data-theme="dark"] .stat-card-inv {
+        background: linear-gradient(135deg, #231633, #1e1e26) !important;
+    }
+</style>
+
+<div class="row mt-4 mb-5">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="fa-solid fa-gauge-high text-danger me-2"></i>Admin Dashboard</h2>
+                <p class="text-muted mb-0">Platform overview, revenue metrics, bookings, and content controls</p>
+            </div>
+            <a href="/listings/new" class="btn btn-brand" style="border-radius: 999px; padding: 0.55rem 1.4rem; font-weight: 600;">
+                <i class="fa-solid fa-plus me-1"></i> Add New Listing
+            </a>
+        </div>
+
+        <!-- STATS METRIC CARDS -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card stat-card-rev h-100 p-3 shadow-sm border-0" style="border-radius: 1rem;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Total Revenue</span>
+                            <h3 class="fw-bold mt-1 mb-0">&#8377;<%= totalRevenue.toLocaleString("en-IN") %></h3>
+                            <small class="text-success"><i class="fa-solid fa-arrow-trend-up"></i> Confirmed bookings</small>
+                        </div>
+                        <div class="rounded-circle p-3 bg-danger-subtle text-danger fs-4">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card stat-card-fee h-100 p-3 shadow-sm border-0" style="border-radius: 1rem;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Platform Fee (5%)</span>
+                            <h3 class="fw-bold mt-1 mb-0">&#8377;<%= totalServiceFees.toLocaleString("en-IN") %></h3>
+                            <small class="text-info">Net platform earnings</small>
+                            <div class="text-muted small mt-1" style="font-size: 0.72rem;">GST: &#8377;<%= (typeof totalGstCollected !== 'undefined' ? totalGstCollected : 0).toLocaleString("en-IN") %></div>
+                        </div>
+                        <div class="rounded-circle p-3 bg-info-subtle text-info fs-4">
+                            <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card stat-card-book h-100 p-3 shadow-sm border-0" style="border-radius: 1rem;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Total Bookings</span>
+                            <h3 class="fw-bold mt-1 mb-0"><%= totalBookings %></h3>
+                            <small class="text-success"><%= confirmedCount %> confirmed &bull; <%= cancelledCount %> cancelled</small>
+                        </div>
+                        <div class="rounded-circle p-3 bg-success-subtle text-success fs-4">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card stat-card-inv h-100 p-3 shadow-sm border-0" style="border-radius: 1rem;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold">Active Inventory</span>
+                            <h3 class="fw-bold mt-1 mb-0"><%= totalListings %> Stays</h3>
+                            <small class="text-muted"><%= totalUsers %> Registered Users</small>
+                        </div>
+                        <div class="rounded-circle p-3 bg-primary-subtle text-primary fs-4">
+                            <i class="fa-solid fa-house-chimney"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- REVENUE & INVENTORY ANALYTICS CHARTS (CHART.JS) -->
+        <div class="row g-4 mb-4">
+            <!-- REVENUE & BOOKING TREND (LINE & AREA) -->
+            <div class="col-12 col-lg-8">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 1.15rem;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">
+                                <i class="fa-solid fa-chart-line text-danger me-2"></i>Revenue & Booking Growth
+                            </h5>
+                            <small class="text-muted">6-Month billing trajectory & monthly guest reservations</small>
+                        </div>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                            <i class="fa-solid fa-arrow-trend-up me-1"></i> Live Analytics
+                        </span>
+                    </div>
+                    <div style="position: relative; height: 280px; width: 100%;">
+                        <canvas id="revenueTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CATEGORY DISTRIBUTION (DOUGHNUT) -->
+            <div class="col-12 col-lg-4">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 1.15rem;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="fw-bold mb-0">
+                                <i class="fa-solid fa-chart-pie text-primary me-2"></i>Stay Categories
+                            </h5>
+                            <small class="text-muted">Inventory spread across categories</small>
+                        </div>
+                    </div>
+                    <div style="position: relative; height: 280px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                        <canvas id="categorySpreadChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABS SECTION -->
+        <ul class="nav nav-pills mb-3" id="adminTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-semibold" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings-pane" type="button" role="tab">
+                    <i class="fa-solid fa-receipt me-1"></i> All Bookings (<%= allBookings.length %>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold" id="listings-tab" data-bs-toggle="tab" data-bs-target="#listings-pane" type="button" role="tab">
+                    <i class="fa-solid fa-hotel me-1"></i> Listings Inventory (<%= allListings.length %>)
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold" id="users-tab" data-bs-toggle="tab" data-bs-target="#users-pane" type="button" role="tab">
+                    <i class="fa-solid fa-users me-1"></i> Registered Users (<%= allUsers.length %>)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content card p-3 shadow-sm border-0" id="adminTabContent" style="border-radius: 1rem;">
+            
+            <!-- TAB 1: BOOKINGS -->
+            <div class="tab-pane fade show active" id="bookings-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Guest</th>
+                                <th>Listing</th>
+                                <th>Dates</th>
+                                <th>Guests</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (allBookings.length === 0) { %>
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">No bookings found on the platform yet.</td>
+                                </tr>
+                            <% } %>
+                            <% for (let b of allBookings) { %>
+                                <tr>
+                                    <td><small class="font-monospace text-muted">#<%= b._id.toString().slice(-6) %></small></td>
+                                    <td>
+                                        <% if (b.user) { %>
+                                            <div class="fw-semibold"><%= b.user.username %></div>
+                                            <small class="text-muted"><%= b.user.email %></small>
+                                        <% } else { %>
+                                            <span class="text-muted">Deleted User</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <% if (b.listing) { %>
+                                            <a href="/listings/<%= b.listing._id %>" class="text-decoration-none fw-semibold text-dark">
+                                                <%= b.listing.title %>
+                                            </a>
+                                            <div class="small text-muted"><%= b.listing.location %>, <%= b.listing.country %></div>
+                                        <% } else { %>
+                                            <span class="text-muted">Deleted Listing</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <small><%= b.checkIn.toDateString() %></small><br/>
+                                        <small class="text-muted">to <%= b.checkOut.toDateString() %> (<%= b.nights %>n)</small>
+                                    </td>
+                                    <td><%= b.guests %></td>
+                                    <td><b>&#8377;<%= b.totalPrice.toLocaleString("en-IN") %></b></td>
+                                    <td>
+                                        <span class="status-badge <%= b.status === 'cancelled' ? 'status-cancelled' : 'status-confirmed' %>">
+                                            <%= b.status %>
+                                        </span>
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="/bookings/<%= b._id %>" class="btn btn-sm btn-outline-secondary me-1" title="View Tax Invoice">
+                                            <i class="fa-solid fa-receipt me-1"></i> Invoice
+                                        </a>
+                                        <% if (b.status !== 'cancelled') { %>
+                                            <form method="POST" action="/admin/bookings/<%= b._id %>/cancel?_method=DELETE" class="d-inline"
+                                                  data-confirm="Cancel this guest reservation and immediately issue a full refund to their payment account?"
+                                                  data-confirm-title="Admin Refund & Cancel"
+                                                  data-confirm-btn="Issue Refund & Cancel"
+                                                  data-confirm-cancel="Keep Reservation"
+                                                  data-confirm-type="danger"
+                                                  data-confirm-icon="fa-ban">
+                                                <button class="btn btn-sm btn-outline-danger" title="Cancel & Refund">
+                                                    <i class="fa-solid fa-ban"></i> Refund
+                                                </button>
+                                            </form>
+                                        <% } else { %>
+                                            <span class="text-muted small">Refunded</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 2: LISTINGS -->
+            <div class="tab-pane fade" id="listings-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Photo</th>
+                                <th>Title</th>
+                                <th>Location</th>
+                                <th>Category</th>
+                                <th>Price / Night</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (let l of allListings) { %>
+                                <tr>
+                                    <td style="width: 70px;">
+                                        <img src="<%= l.image ? l.image.url : '' %>" alt="listing" style="width: 60px; height: 45px; object-fit: cover; border-radius: 6px;">
+                                    </td>
+                                    <td>
+                                        <a href="/listings/<%= l._id %>" class="text-decoration-none fw-semibold text-dark">
+                                            <%= l.title %>
+                                        </a>
+                                    </td>
+                                    <td><%= l.location %>, <%= l.country %></td>
+                                    <td><span class="badge bg-secondary-subtle text-secondary text-capitalize"><%= l.category %></span></td>
+                                    <td><b>&#8377;<%= l.price.toLocaleString("en-IN") %></b></td>
+                                    <td class="text-end">
+                                        <a href="/listings/<%= l._id %>" class="btn btn-sm btn-outline-secondary me-1" title="View"><i class="fa-solid fa-eye"></i></a>
+                                        <a href="/listings/<%= l._id %>/edit" class="btn btn-sm btn-outline-primary me-1" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a>
+                                        <a href="/listings/<%= l._id %>/reservations" class="btn btn-sm btn-outline-info me-1" title="Reservations"><i class="fa-solid fa-calendar"></i></a>
+                                        <form method="POST" action="/listings/<%= l._id %>?_method=DELETE" class="d-inline"
+                                              data-confirm="Are you sure you want to permanently delete this listing from the database?"
+                                              data-confirm-title="Delete Listing Permanently"
+                                              data-confirm-btn="Delete Listing"
+                                              data-confirm-cancel="Nevermind"
+                                              data-confirm-type="danger"
+                                              data-confirm-icon="fa-trash-can">
+                                            <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB 3: USERS -->
+            <div class="tab-pane fade" id="users-pane" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Location</th>
+                                <th>Pincode</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (let u of allUsers) { %>
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center fw-bold" style="width: 34px; height: 34px;">
+                                                <%= (u.username || "U").charAt(0).toUpperCase() %>
+                                            </div>
+                                            <div>
+                                                <b><%= u.username %></b>
+                                                <% if (u.email === 'shubhamkumar979883@gmail.com') { %>
+                                                    <span class="badge bg-danger ms-1">Admin</span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><%= u.email %></td>
+                                    <td><%= u.phone || "—" %></td>
+                                    <td><%= u.district || "" %><%= u.district && u.state ? ", " : "" %><%= u.state || "" %> (<%= u.country || "India" %>)</td>
+                                    <td><%= u.pincode || "—" %></td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- CHART.JS INTEGRATION -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.documentElement.getAttribute('data-theme') === 'dark';
+        const textColor = isDark ? '#9ca3af' : '#475569';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+
+        // 1. Revenue & Bookings Trend Chart
+        const revCtx = document.getElementById('revenueTrendChart');
+        if (revCtx) {
+            new Chart(revCtx, {
+                type: 'line',
+                data: {
+                    labels: <%- JSON.stringify(monthlyLabels) %>,
+                    datasets: [
+                        {
+                            label: 'Revenue (₹)',
+                            data: <%- JSON.stringify(monthlyRevenueData) %>,
+                            borderColor: '#fe424d',
+                            backgroundColor: 'rgba(254, 66, 77, 0.12)',
+                            fill: true,
+                            tension: 0.38,
+                            borderWidth: 3,
+                            pointBackgroundColor: '#fe424d',
+                            pointRadius: 4,
+                            pointHoverRadius: 7,
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: 'Bookings Count',
+                            data: <%- JSON.stringify(monthlyBookingsData) %>,
+                            borderColor: '#0284c7',
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            borderWidth: 2,
+                            pointBackgroundColor: '#0284c7',
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: gridColor },
+                            ticks: { color: textColor, font: { weight: '600' } }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: gridColor },
+                            ticks: {
+                                color: textColor,
+                                callback: function (val) {
+                                    return '₹' + val.toLocaleString('en-IN');
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: {
+                                color: textColor,
+                                stepSize: 1
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: textColor, font: { weight: '600' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (ctx) {
+                                    if (ctx.dataset.label.includes('Revenue')) {
+                                        return ' Revenue: ₹' + ctx.parsed.y.toLocaleString('en-IN');
+                                    }
+                                    return ' Bookings: ' + ctx.parsed.y;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Category Spread Doughnut Chart
+        const catCtx = document.getElementById('categorySpreadChart');
+        if (catCtx) {
+            new Chart(catCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: <%- JSON.stringify(categoryLabels) %>,
+                    datasets: [{
+                        data: <%- JSON.stringify(categoryData) %>,
+                        backgroundColor: [
+                            '#fe424d', '#f97316', '#3b82f6', '#10b981', 
+                            '#8b5cf6', '#ec4899', '#06b6d4', '#eab308',
+                            '#64748b', '#14b8a6'
+                        ],
+                        borderWidth: 2,
+                        borderColor: isDark ? '#161922' : '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: textColor, boxWidth: 12, padding: 8, font: { size: 11 } }
+                        }
+                    },
+                    cutout: '66%'
+                }
+            });
+        }
+    });
+</script>

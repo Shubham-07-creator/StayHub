@@ -1,66 +1,329 @@
 <% layout("/layouts/boilerplate") %>
 
 <div class="auth-wrapper">
-    <div class="auth-card">
-        <h1>Sign up on StayHub</h1>
-        <form action="/signup" method="POST" class="needs-validation" novalidate>
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input
-                name="username"
-                id="username"
-                type="text"
-                class="form-control"
-                required
-                />
-                <div class="valid-feedback">Looks Good!</div>
+    <div class="auth-card auth-card-lg shadow-lg">
+        <div class="text-center mb-3">
+            <a href="/listings" class="text-decoration-none">
+                <img src="/images/logo.svg" alt="StayHub" height="42" class="mb-2" />
+            </a>
+            <h1 class="fw-bold">Create your account</h1>
+            <p class="auth-subtitle">Join StayHub to discover and book extraordinary places around the world</p>
+        </div>
+
+        <!-- Google OAuth Button -->
+        <a href="/auth/google" class="btn-google-oauth mb-3">
+            <svg viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 10.04 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Sign up with Google</span>
+        </a>
+
+        <!-- Divider -->
+        <div class="auth-divider">
+            <span>or sign up with email</span>
+        </div>
+
+        <form action="/signup" method="POST" class="needs-validation" id="signupForm" novalidate>
+            
+            <!-- SECTION 1: PERSONAL INFORMATION -->
+            <div class="form-section-divider mt-0">
+                <span><i class="fa-regular fa-user me-1 text-danger"></i> Personal Details</span>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input
-                name="email"
-                id="email"
-                type="email"
-                class="form-control"
-                required
-                />
-                <div class="form-text">We'll send a verification link to this email.</div>
+
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label for="username" class="form-label fw-semibold small">Full Name</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-regular fa-user input-icon"></i>
+                        <input
+                            name="username"
+                            id="username"
+                            type="text"
+                            placeholder="John Doe"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="invalid-feedback small">Please enter your name.</div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="email" class="form-label fw-semibold small">Email Address</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-regular fa-envelope input-icon"></i>
+                        <input
+                            name="email"
+                            id="email"
+                            type="email"
+                            placeholder="you@example.com"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div id="emailTypoHint" class="text-warning small mt-1 d-none"></div>
+                    <div class="invalid-feedback small">Please enter a valid email address.</div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="phone" class="form-label fw-semibold small">Mobile Phone</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-solid fa-phone input-icon"></i>
+                        <input
+                            name="phone"
+                            id="phone"
+                            type="tel"
+                            pattern="[0-9]{10}"
+                            maxlength="10"
+                            placeholder="10-digit number"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="invalid-feedback small">Enter a valid 10-digit mobile number.</div>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <label for="dob" class="form-label fw-semibold small">Date of Birth</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-regular fa-calendar input-icon"></i>
+                        <input
+                            name="dob"
+                            id="dob"
+                            type="date"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="invalid-feedback small">Please enter your date of birth.</div>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-group">
+
+            <!-- SECTION 2: ADDRESS & LOCATION -->
+            <div class="form-section-divider">
+                <span><i class="fa-solid fa-location-dot me-1 text-danger"></i> Location Details</span>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12 col-sm-6">
+                    <label for="pincode" class="form-label fw-semibold small">PIN Code</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-solid fa-map-pin input-icon"></i>
+                        <input
+                            name="pincode"
+                            id="pincode"
+                            type="text"
+                            pattern="[0-9]{6}"
+                            maxlength="6"
+                            placeholder="e.g. 110001"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="invalid-feedback small">Enter valid 6-digit PIN code.</div>
+                </div>
+
+                <div class="col-12 col-sm-6">
+                    <label for="country" class="form-label fw-semibold small">Country</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-solid fa-earth-asia input-icon"></i>
+                        <input
+                            name="country"
+                            id="country"
+                            type="text"
+                            placeholder="India"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="invalid-feedback small">Country name is required.</div>
+                </div>
+
+                <div class="col-12 col-sm-6">
+                    <label for="state" class="form-label fw-semibold small">State</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-solid fa-map input-icon"></i>
+                        <input
+                            name="state"
+                            id="state"
+                            type="text"
+                            placeholder="Maharashtra, Delhi..."
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="invalid-feedback small">State is required.</div>
+                </div>
+
+                <div class="col-12 col-sm-6">
+                    <label for="district" class="form-label fw-semibold small">District / City</label>
+                    <div class="input-icon-wrap">
+                        <i class="fa-solid fa-city input-icon"></i>
+                        <input
+                            name="district"
+                            id="district"
+                            type="text"
+                            placeholder="Mumbai, New Delhi..."
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                    <div class="invalid-feedback small">District is required.</div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: SECURITY & PASSWORD -->
+            <div class="form-section-divider">
+                <span><i class="fa-solid fa-lock me-1 text-danger"></i> Password & Security</span>
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label fw-semibold small">Password</label>
+                <div class="input-icon-wrap has-pwd-toggle">
+                    <i class="fa-solid fa-lock input-icon"></i>
                     <input
-                    name="password"
-                    id="password"
-                    type="password"
-                    class="form-control"
-                    required
+                        name="password"
+                        id="password"
+                        type="password"
+                        placeholder="Create a secure password"
+                        minlength="6"
+                        class="form-control"
+                        required
                     />
                     <button
                         type="button"
-                        class="btn btn-outline-secondary"
+                        class="btn-pwd-toggle"
                         id="togglePassword"
                         tabindex="-1"
-                    ><i class="fa-solid fa-eye" id="toggleIcon"></i></button>
+                        aria-label="Toggle password visibility"
+                    >
+                        <i class="fa-regular fa-eye" id="toggleIcon"></i>
+                    </button>
                 </div>
+                <!-- REAL-TIME STRENGTH METER -->
+                <div class="pwd-strength-container">
+                    <div class="pwd-strength-bar">
+                        <div class="segment" id="pwdSeg1"></div>
+                        <div class="segment" id="pwdSeg2"></div>
+                        <div class="segment" id="pwdSeg3"></div>
+                        <div class="segment" id="pwdSeg4"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="pwd-strength-text" id="pwdStrengthText">Enter at least 6 characters</span>
+                        <span class="text-muted" style="font-size: 0.72rem;">Min. 6 chars</span>
+                    </div>
+                </div>
+                <div class="invalid-feedback small">Password must be at least 6 characters.</div>
             </div>
-            <button type="submit" class="btn btn-brand">Sign Up</button>
+
+            <button type="submit" class="btn btn-brand py-2 fw-semibold" id="submitBtn">
+                <i class="fa-solid fa-paper-plane me-1"></i> <span>Send Verification Code & Continue</span>
+            </button>
+            <div class="text-center mt-2">
+                <small class="text-muted" style="font-size: 0.78rem;">
+                    <i class="fa-solid fa-shield-halved text-success me-1"></i> We'll email you a 6-digit verification code to confirm your email.
+                </small>
+            </div>
         </form>
-        <p class="text-center mt-3 mb-0">
-            Already have an account? <a href="/login" style="color: var(--brand); font-weight: 600;">Log in</a>
-        </p>
+
+        <div class="text-center mt-3 pt-2 border-top">
+            <span class="text-muted small">Already have an account?</span>
+            <a href="/login" class="fw-bold ms-1" style="color: var(--brand); text-decoration: none;">Log in</a>
+        </div>
     </div>
 </div>
 
 <script>
+    // Password visibility toggle
     const pwdInput = document.getElementById("password");
     const toggleBtn = document.getElementById("togglePassword");
     const toggleIcon = document.getElementById("toggleIcon");
 
-    toggleBtn.addEventListener("click", () => {
-        const isHidden = pwdInput.type === "password";
-        pwdInput.type = isHidden ? "text" : "password";
-        toggleIcon.classList.toggle("fa-eye");
-        toggleIcon.classList.toggle("fa-eye-slash");
-    });
+    if (toggleBtn && pwdInput) {
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = pwdInput.type === "password";
+            pwdInput.type = isHidden ? "text" : "password";
+            toggleIcon.className = isHidden ? "fa-regular fa-eye-slash" : "fa-regular fa-eye";
+        });
+    }
+
+    // Real-time Password Strength Meter
+    const seg1 = document.getElementById("pwdSeg1");
+    const seg2 = document.getElementById("pwdSeg2");
+    const seg3 = document.getElementById("pwdSeg3");
+    const seg4 = document.getElementById("pwdSeg4");
+    const strengthText = document.getElementById("pwdStrengthText");
+
+    if (pwdInput) {
+        pwdInput.addEventListener("input", function() {
+            const val = this.value;
+            let score = 0;
+            if (val.length >= 6) score++;
+            if (val.length >= 8) score++;
+            if (/[0-9]/.test(val)) score++;
+            if (/[^A-Za-z0-9]/.test(val) || /[A-Z]/.test(val)) score++;
+
+            const colors = {
+                0: "var(--border-soft)",
+                1: "#ef4444", // red
+                2: "#f97316", // orange
+                3: "#eab308", // yellow
+                4: "#22c55e"  // green
+            };
+
+            const labels = {
+                0: "Enter at least 6 characters",
+                1: "Weak password",
+                2: "Fair password",
+                3: "Good password",
+                4: "Strong password! 🔒"
+            };
+
+            const activeColor = colors[score];
+            seg1.style.backgroundColor = score >= 1 ? activeColor : "var(--border-soft)";
+            seg2.style.backgroundColor = score >= 2 ? activeColor : "var(--border-soft)";
+            seg3.style.backgroundColor = score >= 3 ? activeColor : "var(--border-soft)";
+            seg4.style.backgroundColor = score >= 4 ? activeColor : "var(--border-soft)";
+
+            strengthText.textContent = labels[score];
+            strengthText.style.color = score === 0 ? "var(--text-muted)" : activeColor;
+        });
+    }
+
+    // Email typo detector
+    const emailInput = document.getElementById("email");
+    const emailTypoHint = document.getElementById("emailTypoHint");
+    if (emailInput && emailTypoHint) {
+        emailInput.addEventListener("blur", function() {
+            const val = this.value.trim().toLowerCase();
+            const typoMap = {
+                "gmial.com": "gmail.com",
+                "gmai.com": "gmail.com",
+                "gamil.com": "gmail.com",
+                "yaho.com": "yahoo.com",
+                "hotmial.com": "hotmail.com"
+            };
+            const parts = val.split("@");
+            if (parts.length === 2 && typoMap[parts[1]]) {
+                emailTypoHint.textContent = `Did you mean ${parts[0]}@${typoMap[parts[1]]}?`;
+                emailTypoHint.classList.remove("d-none");
+            } else {
+                emailTypoHint.classList.add("d-none");
+            }
+        });
+    }
+
+    // Submit button spinner on valid submit
+    const signupForm = document.getElementById("signupForm");
+    const submitBtn = document.getElementById("submitBtn");
+    if (signupForm && submitBtn) {
+        signupForm.addEventListener("submit", function(e) {
+            if (this.checkValidity()) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Sending Verification Code...';
+            }
+        });
+    }
 </script>

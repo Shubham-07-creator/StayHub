@@ -63,7 +63,14 @@ amenities: {
     type: [String],
     default: ["WiFi", "Air conditioning", "Kitchen", "Free parking", "TV"],
 },
-});    
+});
+
+// High-performance query indexes
+listingSchema.index({ category: 1 });
+listingSchema.index({ price: 1 });
+listingSchema.index({ owner: 1 });
+listingSchema.index({ location: 1, country: 1 });
+listingSchema.index({ "geometry.coordinates": "2dsphere" });    
 
 listingSchema.post('findOneAndDelete', async (listing) => {
     if (listing) {

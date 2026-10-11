@@ -1,74 +1,348 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="confirmation-card card">
-    <h3 class="mb-3">
-        <i class="fa-solid fa-circle-check" style="color: #1a7a3e;"></i>
-        Booking Confirmed
-    </h3>
+<style>
+    .invoice-card {
+        max-width: 860px;
+        margin: 2rem auto;
+        background: #ffffff;
+        border: 1px solid var(--sp-border, #e5e7eb);
+        border-radius: 1.25rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+        overflow: hidden;
+        animation: cardRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .invoice-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 42px rgba(0, 0, 0, 0.1);
+    }
 
-    <img
-        src="<%= booking.listing.image.url %>"
-        class="card-img-top mb-3"
-        alt="Listing Image"
-        style="height: 220px; object-fit: cover; border-radius: 0.75rem;"
-    />
+    [data-bs-theme="dark"] .invoice-card,
+    [data-theme="dark"] .invoice-card {
+        background: #161922;
+        border-color: #252936;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
 
-    <h5><%= booking.listing.title %></h5>
-    <p class="listing-subinfo mb-3">
-        <%= booking.listing.location %>, <%= booking.listing.country %>
-    </p>
+    .invoice-header-banner {
+        background: linear-gradient(135deg, #fe424d 0%, #e02f3a 100%);
+        color: #ffffff;
+        padding: 2rem;
+    }
 
-    <div class="section-divider"></div>
+    .invoice-badge-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
 
-    <p class="price-breakdown-row">
-        <span>Check-in</span>
-        <b style="color: var(--text-dark);"><%= booking.checkIn.toDateString() %></b>
-    </p>
-    <p class="price-breakdown-row">
-        <span>Check-out</span>
-        <b style="color: var(--text-dark);"><%= booking.checkOut.toDateString() %></b>
-    </p>
-    <p class="price-breakdown-row">
-        <span>Guests</span>
-        <b style="color: var(--text-dark);"><%= booking.guests %></b>
-    </p>
+    .invoice-status-confirmed {
+        background: #dcfce7;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
 
-    <div class="section-divider"></div>
+    .invoice-status-cancelled {
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
 
-    <p class="price-breakdown-row">
-        <span>&#8377;<%= booking.pricePerNight.toLocaleString("en-IN") %> x <%= booking.nights %> night<%= booking.nights > 1 ? "s" : "" %></span>
-        <span>&#8377;<%= booking.subtotal.toLocaleString("en-IN") %></span>
-    </p>
-    <p class="price-breakdown-row">
-        <span>Service fee</span>
-        <span>&#8377;<%= booking.serviceFee.toLocaleString("en-IN") %></span>
-    </p>
+    .invoice-section-title {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.75px;
+        color: #6b7280;
+        font-weight: 700;
+        margin-bottom: 0.75rem;
+    }
 
-    <div class="section-divider"></div>
+    .invoice-table th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background-color: rgba(0,0,0,0.02);
+        color: #6b7280;
+        font-weight: 600;
+        border-bottom: 2px solid #e5e7eb;
+    }
 
-    <p class="price-breakdown-total mb-3">
-        <span>Total paid</span>
-        <span>&#8377;<%= booking.totalPrice.toLocaleString("en-IN") %></span>
-    </p>
+    [data-bs-theme="dark"] .invoice-table th,
+    [data-theme="dark"] .invoice-table th {
+        background-color: rgba(255,255,255,0.03);
+        border-color: #252936;
+        color: #9ca3af;
+    }
 
-    <p class="mb-3">
-        <span class="status-badge <%= booking.status === 'cancelled' ? 'status-cancelled' : 'status-confirmed' %>">
-            <%= booking.status %>
-        </span>
-    </p>
+    .invoice-table td {
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
 
-    <div class="d-flex gap-2 flex-wrap">
-        <a href="/listings/<%= booking.listing._id %>" class="btn btn-brand-outline">
-            View Listing
+    @media print {
+        body {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+        nav, footer, .btn, .no-print, .toast-container {
+            display: none !important;
+        }
+        .invoice-card {
+            box-shadow: none !important;
+            border: 1px solid #ccc !important;
+            margin: 0 !important;
+            max-width: 100% !important;
+            border-radius: 0 !important;
+        }
+        .invoice-header-banner {
+            background: #222 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+</style>
+
+<% 
+    const isGuestUser = currUser && booking.user && (booking.user._id ? booking.user._id.equals(currUser._id) : booking.user.equals(currUser._id));
+    const isHostViewer = currUser && booking.listing && booking.listing.owner && (booking.listing.owner._id ? booking.listing.owner._id.equals(currUser._id) : booking.listing.owner.equals(currUser._id));
+    const todayFloor = new Date();
+    todayFloor.setHours(0, 0, 0, 0);
+    const isUpcomingStay = new Date(booking.checkIn) >= todayFloor;
+%>
+
+<div class="container pb-5">
+    <!-- TOP ACTION BUTTONS -->
+    <div class="d-flex justify-content-between align-items-center mt-3 mb-2 no-print max-w-860 mx-auto" style="max-width: 860px;">
+        <% if (isHostViewer) { %>
+        <a href="/listings/<%= booking.listing._id %>/reservations" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Reservations
         </a>
-        <a href="/bookings" class="btn btn-brand-outline">
-            My Trips
+        <% } else { %>
+        <a href="/bookings" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back to Trips
         </a>
-        <% if (booking.status !== 'cancelled') { %>
-        <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE">
-            <button class="btn btn-dark-outline">Cancel Booking</button>
-        </form>
         <% } %>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-sm btn-outline-dark rounded-pill px-3 shadow-sm">
+                <i class="fa-solid fa-print me-1"></i> Print / Download PDF
+            </button>
+            <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-brand rounded-pill px-3 shadow-sm">
+                <i class="fa-solid fa-house me-1"></i> View Stay
+            </a>
+        </div>
     </div>
 
+    <div class="invoice-card">
+        <!-- HEADER -->
+        <div class="invoice-header-banner">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i class="fa-solid fa-compass fs-3"></i>
+                        <span class="fs-4 fw-bold">StayHub</span>
+                    </div>
+                    <p class="mb-0 small opacity-75">Official Indian Hospitality Tax Invoice & Stay Voucher</p>
+                    <p class="mb-0 small opacity-75">GSTIN: <b>07AABCS1429B1Z1</b> &bull; SAC Code: <b>996311</b></p>
+                </div>
+                <div class="text-sm-end">
+                    <span class="invoice-badge-status <%= booking.status === 'cancelled' ? 'invoice-status-cancelled' : 'invoice-status-confirmed' %>">
+                        <i class="fa-solid <%= booking.status === 'cancelled' ? 'fa-circle-xmark' : 'fa-circle-check' %>"></i>
+                        <%= booking.status === 'cancelled' ? 'Booking Cancelled' : 'Confirmed & Paid' %>
+                    </span>
+                    <h5 class="fw-bold mt-2 mb-0">
+                        <%= booking.invoiceNumber || ('SH-INV-' + booking._id.toString().slice(-8).toUpperCase()) %>
+                    </h5>
+                    <p class="small mb-0 opacity-75">
+                        Date: <%= (booking.createdAt || new Date()).toLocaleDateString("en-IN", { day: '2-digit', month: 'short', year: 'numeric' }) %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 p-md-5">
+            <!-- GUEST & STAY METRICS -->
+            <div class="row g-4 mb-4 pb-4 border-bottom">
+                <div class="col-12 col-md-6">
+                    <div class="invoice-section-title">
+                        <i class="fa-solid fa-user me-1 text-danger"></i> Guest Details (Billed To)
+                    </div>
+                    <h6 class="fw-bold mb-1">
+                        <%= booking.user ? (booking.user.name || booking.user.username) : "Valued Guest" %>
+                    </h6>
+                    <p class="small text-muted mb-1">
+                        <i class="fa-solid fa-envelope me-1"></i> <%= booking.user ? booking.user.email : "guest@stayhub.com" %>
+                    </p>
+                    <% if (booking.user && booking.user.phone) { %>
+                    <p class="small text-muted mb-1">
+                        <i class="fa-solid fa-phone me-1"></i> <%= booking.user.phone %>
+                    </p>
+                    <% } %>
+                    <p class="small text-muted mb-0">
+                        <i class="fa-solid fa-location-dot me-1"></i> 
+                        <%= booking.user && booking.user.district ? (booking.user.district + ', ' + booking.user.state + ', India') : 'Registered Guest, India' %>
+                    </p>
+                </div>
+
+                <div class="col-12 col-md-6">
+                    <div class="invoice-section-title">
+                        <i class="fa-solid fa-hotel me-1 text-danger"></i> Stay & Property Details
+                    </div>
+                    <h6 class="fw-bold mb-1"><%= booking.listing.title %></h6>
+                    <p class="small text-muted mb-1">
+                        <i class="fa-solid fa-map-pin me-1"></i> <%= booking.listing.location %>, <%= booking.listing.country %>
+                    </p>
+                    <div class="p-2 rounded-3 bg-light-subtle border small mt-2">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Check-in:</span>
+                            <b><%= booking.checkIn.toDateString() %> (from 2:00 PM)</b>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>Check-out:</span>
+                            <b><%= booking.checkOut.toDateString() %> (by 11:00 AM)</b>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Duration & Guests:</span>
+                            <b><%= booking.nights %> night<%= booking.nights > 1 ? 's' : '' %> &bull; <%= booking.guests %> guest<%= booking.guests > 1 ? 's' : '' %></b>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ITEMIZED TAX INVOICE BREAKDOWN -->
+            <div class="invoice-section-title mb-2">
+                <i class="fa-solid fa-file-invoice-dollar me-1 text-danger"></i> Itemized Tax Calculation
+            </div>
+            <div class="table-responsive mb-4">
+                <table class="table invoice-table border align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>SAC Code</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Tariff</th>
+                            <th class="text-end">Taxable Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="fw-bold">Accommodation Stay Charges</div>
+                                <div class="text-muted small"><%= booking.listing.title %></div>
+                            </td>
+                            <td><span class="badge bg-secondary-subtle text-secondary">996311</span></td>
+                            <td class="text-center"><%= booking.nights %> night<%= booking.nights > 1 ? 's' : '' %></td>
+                            <td class="text-end">&#8377;<%= booking.pricePerNight.toLocaleString("en-IN") %></td>
+                            <td class="text-end fw-semibold">&#8377;<%= booking.subtotal.toLocaleString("en-IN") %></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fw-bold">StayHub Platform Facilitation Fee (5%)</div>
+                                <div class="text-muted small">Guest protection & verified stay services</div>
+                            </td>
+                            <td><span class="badge bg-secondary-subtle text-secondary">998559</span></td>
+                            <td class="text-center">1</td>
+                            <td class="text-end">5%</td>
+                            <td class="text-end fw-semibold">&#8377;<%= booking.serviceFee.toLocaleString("en-IN") %></td>
+                        </tr>
+                        <tr class="table-light">
+                            <td colspan="4" class="text-end fw-semibold text-muted">Total Taxable Amount:</td>
+                            <td class="text-end fw-bold">&#8377;<%= (booking.subtotal + booking.serviceFee).toLocaleString("en-IN") %></td>
+                        </tr>
+                        
+                        <% 
+                            const effectiveGstRate = booking.gstRate || (booking.pricePerNight <= 7500 ? 12 : 18);
+                            const halfRate = effectiveGstRate / 2;
+                            const totalGst = booking.gstAmount || (booking.totalPrice - booking.subtotal - booking.serviceFee);
+                            const halfGst = booking.cgst || Math.round(totalGst / 2);
+                            const otherHalfGst = booking.sgst || (totalGst - halfGst);
+                        %>
+                        <tr>
+                            <td colspan="4" class="text-end text-muted small">
+                                Central Goods and Services Tax (<b>CGST <%= halfRate %>%</b>):
+                            </td>
+                            <td class="text-end text-muted small">&#8377;<%= halfGst.toLocaleString("en-IN") %></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" class="text-end text-muted small">
+                                State Goods and Services Tax (<b>SGST <%= halfRate %>%</b>):
+                            </td>
+                            <td class="text-end text-muted small">&#8377;<%= otherHalfGst.toLocaleString("en-IN") %></td>
+                        </tr>
+                        <tr class="table-group-divider" style="border-top: 2px solid #222;">
+                            <td colspan="4" class="text-end fs-6 fw-bold">
+                                Grand Total Paid (INR):
+                            </td>
+                            <td class="text-end fs-5 fw-bold text-danger">
+                                &#8377;<%= booking.totalPrice.toLocaleString("en-IN") %>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- PAYMENT AUDIT TRAIL & COMPLIANCE -->
+            <div class="row g-3 p-3 rounded-3 bg-light-subtle border mb-4 small">
+                <div class="col-12 col-md-4">
+                    <span class="text-muted d-block">Payment Method:</span>
+                    <b class="d-flex align-items-center gap-1">
+                        <i class="fa-solid fa-credit-card text-success"></i> Razorpay Payment Gateway
+                    </b>
+                </div>
+                <div class="col-12 col-md-4">
+                    <span class="text-muted d-block">Razorpay Payment ID:</span>
+                    <code class="text-dark"><%= booking.razorpayPaymentId || "PAY-ONLINE-VERIFIED" %></code>
+                </div>
+                <div class="col-12 col-md-4">
+                    <span class="text-muted d-block">Razorpay Order ID:</span>
+                    <code class="text-dark"><%= booking.razorpayOrderId || "ORD-STAYHUB" %></code>
+                </div>
+            </div>
+
+            <!-- FOOTER NOTICE -->
+            <div class="small text-muted border-top pt-3 text-center">
+                <p class="mb-1">
+                    <i class="fa-solid fa-shield-halved text-success me-1"></i>
+                    This is an electronically generated GST tax invoice. No physical signature is required.
+                </p>
+                <p class="mb-0" style="font-size: 0.72rem;">
+                    For any support or query, write to <b>shubhamkumar979883@gmail.com</b> or call <b>+91 89863 39496</b>.
+                </p>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top no-print flex-wrap gap-2">
+                <% if (isHostViewer) { %>
+                <a href="/listings/<%= booking.listing._id %>/reservations" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fa-solid fa-calendar-check me-1"></i> Back to Host Reservations
+                </a>
+                <% } else { %>
+                <a href="/bookings" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fa-solid fa-suitcase me-1"></i> View All Trips
+                </a>
+                <% } %>
+
+                <% if (booking.status !== 'cancelled' && isGuestUser && isUpcomingStay) { %>
+                <form method="POST" action="/bookings/<%= booking._id %>?_method=DELETE"
+                      data-confirm="Are you sure you want to cancel this booking? A 100% refund will be automatically credited to your original payment method."
+                      data-confirm-title="Cancel Reservation?"
+                      data-confirm-btn="Yes, Cancel Booking"
+                      data-confirm-cancel="Keep Booking"
+                      data-confirm-type="danger"
+                      data-confirm-icon="fa-ban">
+                    <button class="btn btn-outline-danger rounded-pill px-4">
+                        <i class="fa-solid fa-ban me-1"></i> Cancel Reservation
+                    </button>
+                </form>
+                <% } %>
+            </div>
+
+        </div>
+    </div>
 </div>

@@ -1,147 +1,361 @@
 <% layout("/layouts/boilerplate") %>
 
-<div class="row mt-4">
-    <div class="col-12 col-md-8 offset-md-2 form-card">
-
-    <h3 class="mb-4">Edit Your Listing</h3>
-    <form method="POST" action="/listings/<%= listing._id %>?_method=PUT"
-        novalidate 
-        class="needs-validation"
-        enctype="multipart/form-data"
-        >
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input 
-            name="listing[title]" 
-            value="<%= listing.title %>" 
-            type="text" 
-            class="form-control"
-            required
-            />
-            <div class="valid-feedback">Title looks good</div>
-        </div>
-
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea 
-            name="listing[description]" class="form-control" required>
-            <%= listing.description %></textarea>
-            <div class="invalid-feedback">Please enter description</div>
-        </div>
-
-        <div class="mb-3">
-            Original Listing Image <br/>
-            <img src="<%= originalImageUrl %>" class="mt-2" style="border-radius: 0.5rem;">
-        </div>
-
-        <div class="mb-3">
-            <label for="image" class="form-label">Upload New Image</label>
-            <input 
-            name="listing[image]" 
-            type="file" 
-            class="form-control"
-            />
-        </div>
+<div class="row justify-content-center my-4">
+    <div class="col-12 col-lg-9 col-xl-8">
         
-        <div class="row">
-        <div class="mb-3 col-md-4">
-            <label for="price" class="form-label">Price</label>
-            <input 
-            name="listing[price]" 
-            value="<%= listing.price %>" 
-            type="number" 
-            class="form-control"
-            required
-            />
-            <div class="invalid-feedback">Enter valid price</div>
-          </div>
-
-        <div class="mb-3 col-md-8">
-        <label for="country" class="form-label">Country</label>
-        <input
-         name="listing[country]" 
-         value="<%= listing.country %>" 
-         type="text" 
-         class="form-control"
-         required
-         />
-         <div class="invalid-feedback">Please enter valid country</div>
-        </div>
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                        <i class="fa-solid fa-shield-halved"></i> Admin Portal
+                    </span>
+                    <span class="text-muted small">Edit Mode</span>
+                </div>
+                <h2 class="fw-bold mb-0">Edit Listing</h2>
+            </div>
+            <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary rounded-pill px-3 py-1 btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back to Listing
+            </a>
         </div>
 
-        <div class="mb-3">
-        <label for="location" class="form-label">Location</label>
-        <input
-         name="listing[location]" 
-         value="<%= listing.location %>" 
-         type="text" 
-         class="form-control"
-         required
-         />
-         <div class="invalid-feedback">Please enter valid location</div>
-        </div>
+        <form 
+            method="POST" 
+            action="/listings/<%= listing._id %>?_method=PUT"
+            novalidate 
+            class="needs-validation"
+            enctype="multipart/form-data"
+            id="editListingForm"
+        >
+            <!-- 1. BASIC INFORMATION -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-pen text-danger"></i> Basic Information
+                </h5>
 
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="title" class="form-label fw-semibold small">Listing Title</label>
+                        <span class="text-muted small" id="titleCount">0 / 70</span>
+                    </div>
+                    <input 
+                        name="listing[title]" 
+                        id="title"
+                        value="<%= listing.title %>" 
+                        type="text" 
+                        class="form-control"
+                        maxlength="70"
+                        required
+                    />
+                    <div class="invalid-feedback small">Please provide a valid title.</div>
+                </div>
 
-      <select name="listing[category]" class="form-control" required>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="description" class="form-label fw-semibold small">Description</label>
+                        <span class="text-muted small" id="descCount">0 / 1000</span>
+                    </div>
+                    <textarea 
+                        name="listing[description]" 
+                        id="description"
+                        rows="4"
+                        class="form-control" 
+                        maxlength="1000"
+                        required
+                    ><%= listing.description.trim() %></textarea>
+                    <div class="invalid-feedback small">Please provide a description.</div>
+                </div>
 
-        <option value="trending" 
-        <%= listing.category === "trending" ? "selected" : "" %>>
-        Trending
-        </option>
+                <div class="mb-2">
+                    <label for="category" class="form-label fw-semibold small">Category</label>
+                    <select name="listing[category]" id="category" class="form-select" required>
+                        <option value="trending" <%= listing.category === "trending" ? "selected" : "" %>>🔥 Trending</option>
+                        <option value="rooms" <%= listing.category === "rooms" ? "selected" : "" %>>🛏️ Rooms</option>
+                        <option value="iconic" <%= listing.category === "iconic" ? "selected" : "" %>>🏙️ Iconic Cities</option>
+                        <option value="mountains" <%= listing.category === "mountains" ? "selected" : "" %>>⛰️ Mountains</option>
+                        <option value="castles" <%= listing.category === "castles" ? "selected" : "" %>>🏰 Castles</option>
+                        <option value="pools" <%= listing.category === "pools" ? "selected" : "" %>>🏊 Amazing Pools</option>
+                        <option value="camping" <%= listing.category === "camping" ? "selected" : "" %>>⛺ Camping</option>
+                        <option value="farms" <%= listing.category === "farms" ? "selected" : "" %>>🚜 Farms</option>
+                        <option value="arctic" <%= listing.category === "arctic" ? "selected" : "" %>>❄️ Arctic</option>
+                        <option value="domes" <%= listing.category === "domes" ? "selected" : "" %>>🛖 Domes</option>
+                        <option value="boats" <%= listing.category === "boats" ? "selected" : "" %>>⛵ Boats</option>
+                    </select>
+                </div>
+            </div>
 
-        <option value="rooms"
-        <%= listing.category === "rooms" ? "selected" : "" %>>
-        Rooms
-        </option>
+            <!-- 2. PHOTO MANAGEMENT -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-regular fa-image text-danger"></i> Listing Photo
+                </h5>
 
-        <option value="iconic"
-        <%= listing.category === "iconic" ? "selected" : "" %>>
-        Iconic Cities
-        </option>
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-5">
+                        <label class="form-label fw-semibold small text-muted">Current Live Photo</label>
+                        <div class="position-relative overflow-hidden rounded-3 border">
+                            <img src="<%= listing.image ? listing.image.url : '' %>" alt="Current listing" class="w-100" style="height: 180px; object-fit: cover;" />
+                            <span class="position-absolute bottom-0 start-0 m-2 badge bg-dark text-white opacity-75 small">Live on site</span>
+                        </div>
+                    </div>
 
-        <option value="mountains"
-        <%= listing.category === "mountains" ? "selected" : "" %>>
-        Mountains
-        </option>
+                    <div class="col-12 col-md-7">
+                        <label for="image" class="form-label fw-semibold small">Replace with New Photo (optional)</label>
+                        <input 
+                            name="listing[image]" 
+                            id="image"
+                            type="file" 
+                            accept="image/*"
+                            class="form-control mb-2"
+                        />
+                        <small class="text-muted d-block">Leave empty if you wish to keep the current live photo.</small>
 
-        <option value="castles"
-        <%= listing.category === "castles" ? "selected" : "" %>>
-        Castles
-        </option>
+                        <div id="newImagePreviewBox" class="d-none mt-2">
+                            <img id="newImagePreviewThumb" src="" alt="New preview" class="rounded-3 border w-100 shadow-sm" style="height: 140px; object-fit: cover;" />
+                            <small class="text-success fw-medium mt-1 d-block"><i class="fa-solid fa-circle-check"></i> New photo selected</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-        <option value="pools"
-        <%= listing.category === "pools" ? "selected" : "" %>>
-        Amazing Pools
-        </option>
+            <!-- 3. PRICING & CAPACITY -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-indian-rupee-sign text-danger"></i> Pricing & Capacity
+                </h5>
 
-        <option value="camping"
-        <%= listing.category === "camping" ? "selected" : "" %>>
-        Camping
-        </option>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label for="price" class="form-label fw-semibold small">Price per Night (₹)</label>
+                        <div class="input-group">
+                            <span class="input-group-text fw-bold">₹</span>
+                            <input 
+                                name="listing[price]" 
+                                id="price"
+                                value="<%= listing.price %>" 
+                                type="number" 
+                                min="100"
+                                class="form-control"
+                                required
+                            />
+                        </div>
+                        <div class="invalid-feedback small">Enter a valid price.</div>
+                    </div>
 
-        <option value="farms"
-        <%= listing.category === "farms" ? "selected" : "" %>>
-        Farms
-        </option>
+                    <div class="col-12 col-md-6">
+                        <label for="maxGuests" class="form-label fw-semibold small">Max Guests</label>
+                        <input 
+                            name="listing[maxGuests]" 
+                            id="maxGuests"
+                            type="number"
+                            min="1"
+                            max="30"
+                            value="<%= listing.maxGuests || 4 %>"
+                            class="form-control"
+                            required
+                        />
+                    </div>
+                </div>
 
-        <option value="arctic"
-        <%= listing.category === "arctic" ? "selected" : "" %>>
-        Arctic
-        </option>
+                <!-- LIVE PRICE CALC (REAL INDIAN GST SLABS) -->
+                <% 
+                    const initialGstRate = listing.price <= 7500 ? 0.12 : 0.18; 
+                    const initialGstPercent = listing.price <= 7500 ? 12 : 18;
+                    const initialGstAmt = Math.round(listing.price * initialGstRate);
+                %>
+                <div id="priceCalcCard" class="mt-3 p-3 rounded-3 bg-light border small">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Base Nightly Rate:</span>
+                        <b id="calcBase">₹<%= listing.price.toLocaleString("en-IN") %></b>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted" id="calcGstLabel">Govt. GST estimate (<%= initialGstPercent %>%):</span>
+                        <span class="text-muted" id="calcGst">+ ₹<%= initialGstAmt.toLocaleString("en-IN") %></span>
+                    </div>
+                    <div class="d-flex justify-content-between pt-2 border-top fw-bold text-dark">
+                        <span>Total Guest Pays / Night:</span>
+                        <span class="text-danger" id="calcTotal">₹<%= (listing.price + initialGstAmt).toLocaleString("en-IN") %></span>
+                    </div>
+                    <div class="text-muted mt-1" style="font-size: 0.7rem;">
+                        <i class="fa-solid fa-circle-info me-1"></i> Govt. Norm: 12% GST on room tariffs &le; ₹7,500/night (18% for &gt; ₹7,500).
+                    </div>
+                </div>
+            </div>
 
-        <option value="domes"
-        <%= listing.category === "domes" ? "selected" : "" %>>
-        Domes
-        </option>
+            <!-- 4. LOCATION DETAILS -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-danger"></i> Location Details
+                </h5>
 
-        <option value="boats"
-        <%= listing.category === "boats" ? "selected" : "" %>>
-        Boats
-        </option>
+                <div class="row g-3">
+                    <div class="col-12 col-md-8">
+                        <label for="location" class="form-label fw-semibold small">City / Area</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-city input-icon"></i>
+                            <input
+                                name="listing[location]" 
+                                id="location"
+                                value="<%= listing.location %>" 
+                                type="text" 
+                                class="form-control"
+                                required
+                            />
+                        </div>
+                        <div class="invalid-feedback small">Location is required.</div>
+                    </div>
 
-      </select>
+                    <div class="col-12 col-md-4">
+                        <label for="country" class="form-label fw-semibold small">Country</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-earth-asia input-icon"></i>
+                            <input
+                                name="listing[country]" 
+                                id="country"
+                                value="<%= listing.country %>" 
+                                type="text" 
+                                class="form-control"
+                                required
+                            />
+                        </div>
+                        <div class="invalid-feedback small">Country is required.</div>
+                    </div>
+                </div>
+            </div>
 
-    <button class="btn btn-brand mt-3">Save Changes</button>
-    </form>
+            <!-- 5. AMENITIES SELECTION -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-2 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-sparkles text-danger"></i> Amenities
+                </h5>
+                <p class="text-muted small mb-3">Update amenities offered at this property.</p>
+
+                <div class="amenity-grid">
+                    <% const availableAmenities = [
+                        { name: "WiFi", icon: "fa-wifi" },
+                        { name: "Air conditioning", icon: "fa-snowflake" },
+                        { name: "Kitchen", icon: "fa-kitchen-set" },
+                        { name: "Free parking", icon: "fa-square-parking" },
+                        { name: "TV", icon: "fa-tv" },
+                        { name: "Swimming pool", icon: "fa-person-swimming" },
+                        { name: "Mountain view", icon: "fa-mountain" },
+                        { name: "Pet friendly", icon: "fa-paw" },
+                        { name: "Dedicated workspace", icon: "fa-laptop" },
+                        { name: "BBQ grill", icon: "fa-fire-burner" }
+                    ]; 
+                    const currentAmenities = listing.amenities || [];
+                    %>
+
+                    <% availableAmenities.forEach((item, index) => { 
+                        const isChecked = currentAmenities.includes(item.name);
+                    %>
+                        <label class="amenity-checkbox-label <%= isChecked ? 'active' : '' %>" id="editAmenityLabel_<%= index %>">
+                            <input 
+                                type="checkbox" 
+                                name="listing[amenities]" 
+                                value="<%= item.name %>" 
+                                <%= isChecked ? "checked" : "" %>
+                                onchange="toggleEditAmenity(this, 'editAmenityLabel_<%= index %>')"
+                            />
+                            <i class="fa-solid <%= item.icon %> text-secondary"></i>
+                            <span><%= item.name %></span>
+                        </label>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div class="d-flex justify-content-end gap-2 mb-5">
+                <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold">Cancel</a>
+                <button type="submit" class="btn btn-brand rounded-pill px-5 py-2 fw-semibold shadow-sm" id="saveListingBtn">
+                    <i class="fa-solid fa-floppy-disk me-2"></i> Save Changes
+                </button>
+            </div>
+        </form>
+
     </div>
 </div>
+
+<script>
+    // Character counters
+    const titleInp = document.getElementById("title");
+    const titleCnt = document.getElementById("titleCount");
+    if (titleInp && titleCnt) {
+        titleCnt.textContent = `${titleInp.value.length} / 70`;
+        titleInp.addEventListener("input", () => {
+            titleCnt.textContent = `${titleInp.value.length} / 70`;
+        });
+    }
+
+    const descInp = document.getElementById("description");
+    const descCnt = document.getElementById("descCount");
+    if (descInp && descCnt) {
+        descCnt.textContent = `${descInp.value.length} / 1000`;
+        descInp.addEventListener("input", () => {
+            descCnt.textContent = `${descInp.value.length} / 1000`;
+        });
+    }
+
+    // Price calculator (Real Indian Hospitality GST Slabs)
+    const prInp = document.getElementById("price");
+    const cBase = document.getElementById("calcBase");
+    const cGst = document.getElementById("calcGst");
+    const cGstLabel = document.getElementById("calcGstLabel");
+    const cTot = document.getElementById("calcTotal");
+    if (prInp) {
+        prInp.addEventListener("input", function() {
+            const price = parseFloat(this.value) || 0;
+            const gstRate = price <= 7500 ? 0.12 : 0.18;
+            const gstPercent = price <= 7500 ? 12 : 18;
+            const gst = Math.round(price * gstRate);
+            const total = price + gst;
+
+            if (cBase) cBase.textContent = `₹${price.toLocaleString("en-IN")}`;
+            if (cGstLabel) cGstLabel.textContent = `Govt. GST estimate (${gstPercent}%):`;
+            if (cGst) cGst.textContent = `+ ₹${gst.toLocaleString("en-IN")}`;
+            if (cTot) cTot.textContent = `₹${total.toLocaleString("en-IN")}`;
+        });
+    }
+
+    // New Image Preview
+    const imgInp = document.getElementById("image");
+    const prevBox = document.getElementById("newImagePreviewBox");
+    const prevThumb = document.getElementById("newImagePreviewThumb");
+    if (imgInp) {
+        imgInp.addEventListener("change", function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    prevThumb.src = e.target.result;
+                    prevBox.classList.remove("d-none");
+                };
+                reader.readAsDataURL(file);
+            } else {
+                prevBox.classList.add("d-none");
+            }
+        });
+    }
+
+    // Amenity toggle
+    function toggleEditAmenity(checkbox, labelId) {
+        const label = document.getElementById(labelId);
+        if (checkbox.checked) {
+            label.classList.add("active");
+        } else {
+            label.classList.remove("active");
+        }
+    }
+
+    // Submit state
+    const editForm = document.getElementById("editListingForm");
+    const saveBtn = document.getElementById("saveListingBtn");
+    if (editForm && saveBtn) {
+        editForm.addEventListener("submit", function() {
+            if (this.checkValidity()) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving Changes...';
+            }
+        });
+    }
+</script>

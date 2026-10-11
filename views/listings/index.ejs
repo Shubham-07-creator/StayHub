@@ -3,363 +3,1011 @@
 <style>
     :root {
         --ip-brand: #fe424d;
-        --ip-brand-dark: #e63946;
-        --ip-text: #222222;
-        --ip-muted: #6a6a6a;
-        --ip-border: #e4e4e4;
+        --ip-brand-dark: #e02f3a;
+        --ip-brand-soft: rgba(254, 66, 77, 0.08);
+        --ip-bg-card: #ffffff;
+        --ip-bg-subtle: #f8fafc;
+        --ip-text: #0f172a;
+        --ip-muted: #64748b;
+        --ip-border: #e2e8f0;
+        --ip-radius-xl: 1.25rem;
         --ip-radius: 1rem;
-        --ip-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        --ip-shadow-hover: 0 12px 24px rgba(0,0,0,0.14);
+        --ip-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+        --ip-shadow-hover: 0 14px 28px rgba(15, 23, 42, 0.10);
     }
 
-    #filters {
+    [data-bs-theme="dark"],
+    [data-theme="dark"] {
+        --ip-bg-card: #161922;
+        --ip-bg-subtle: #1e2230;
+        --ip-text: #f3f4f6;
+        --ip-muted: #9ca3af;
+        --ip-border: #252936;
+        --ip-brand-soft: rgba(254, 66, 77, 0.15);
+        --ip-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+        --ip-shadow-hover: 0 14px 28px rgba(0, 0, 0, 0.5);
+    }
+
+
+    /* HORIZONTAL CATEGORY BAR */
+    .ip-cat-container {
+        position: relative;
         display: flex;
-        flex-wrap: wrap;
         align-items: center;
-        gap: 0;
+        margin-bottom: 1.25rem;
         border-bottom: 1px solid var(--ip-border);
-        padding-bottom: 0.5rem;
+        padding-bottom: 0.25rem;
     }
-
-    .ip-filter {
-        text-align: center;
-        margin-right: 2rem;
-        margin-top: 1.25rem;
-        opacity: 0.65;
-        text-decoration: none;
-        color: var(--ip-text);
-        border-bottom: 2px solid transparent;
-        padding-bottom: 0.6rem;
-        transition: opacity 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    .ip-cat-scroll {
+        display: flex;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        gap: 1.75rem;
+        padding: 0.5rem 0.25rem 0.75rem 0.25rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        width: 100%;
     }
-
-    .ip-filter:hover,
-    .ip-filter.active {
-        opacity: 1;
-        color: var(--ip-brand);
-        border-bottom: 2px solid var(--ip-brand);
-        cursor: pointer;
-    }
-
-    .ip-filter p {
-        font-size: 0.8rem;
-        margin-bottom: 0;
-        margin-top: 0.3rem;
-    }
-
-    .ip-tax-info {
+    .ip-cat-scroll::-webkit-scrollbar {
         display: none;
     }
-
-    .ip-tax-toggle {
+    .ip-cat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.35rem;
+        text-decoration: none;
+        color: var(--ip-muted);
+        opacity: 0.75;
+        white-space: nowrap;
+        border-bottom: 2.5px solid transparent;
+        padding-bottom: 0.5rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        transition: opacity 0.2s ease, color 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        flex-shrink: 0;
+    }
+    .ip-cat-item i {
+        font-size: 1.25rem;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+    }
+    .ip-cat-item:hover {
+        opacity: 1;
+        color: var(--ip-text);
+        transform: translateY(-2px);
+    }
+    .ip-cat-item:hover i {
+        transform: scale(1.12);
+    }
+    .ip-cat-item.active {
+        opacity: 1;
+        color: var(--ip-brand);
+        border-bottom-color: var(--ip-brand);
+    }
+    .ip-cat-item.active i {
+        color: var(--ip-brand);
+    }
+    .ip-cat-arrow {
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--ip-bg-card);
         border: 1px solid var(--ip-border);
-        border-radius: 1rem;
-        padding: 0.6rem 1rem;
-        margin-left: auto;
-        margin-top: 1.25rem;
+        color: var(--ip-text);
+        box-shadow: var(--ip-shadow-sm);
         display: flex;
         align-items: center;
-        white-space: nowrap;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 5;
+        top: 40%;
+        transform: translateY(-50%);
+        transition: all 0.15s ease;
+    }
+    .ip-cat-arrow:hover {
+        transform: translateY(-50%) scale(1.1);
+        border-color: var(--ip-brand);
+        color: var(--ip-brand);
+    }
+    .ip-cat-arrow.left { left: -10px; }
+    .ip-cat-arrow.right { right: -10px; }
+
+    /* FILTERS & CONTROLS TOOLBAR */
+    .ip-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        background: var(--ip-bg-subtle);
+        border: 1px solid var(--ip-border);
+        border-radius: var(--ip-radius);
+        padding: 0.65rem 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .ip-pill-input {
+        background: var(--ip-bg-card);
+        border: 1px solid var(--ip-border);
+        border-radius: 999px;
+        padding: 0.3rem 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.82rem;
     }
 
+    /* TAX TOGGLE PILL */
+    .ip-tax-switch-box {
+        background: var(--ip-bg-card);
+        border: 1px solid var(--ip-border);
+        border-radius: 999px;
+        padding: 0.4rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: border-color 0.15s ease;
+    }
+    .ip-tax-switch-box:hover {
+        border-color: var(--ip-brand);
+    }
+    .ip-tax-switch-box label {
+        cursor: pointer;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--ip-text);
+        margin-bottom: 0;
+        user-select: none;
+    }
+
+    /* LISTINGS GRID */
     .ip-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
         gap: 1.75rem;
-        margin-top: 1.5rem;
+        margin-bottom: 2.5rem;
     }
 
-    .ip-card {
+    /* WORLD-CLASS AIRBNB LISTING CARD */
+    .ip-card-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        border-radius: var(--ip-radius);
         text-decoration: none;
         color: inherit;
+        background: transparent;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: cardRevealUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+        will-change: transform;
+    }
+    .ip-card-wrapper:hover {
+        transform: translateY(-8px);
+    }
+    .ip-card-wrapper:active {
+        transform: translateY(-3px) scale(0.99);
     }
 
-    .ip-img-wrap {
+    /* Staggered entrance animation for grid listing cards */
+    .ip-grid > div:nth-child(1) .ip-card-wrapper { animation-delay: 0.03s; }
+    .ip-grid > div:nth-child(2) .ip-card-wrapper { animation-delay: 0.06s; }
+    .ip-grid > div:nth-child(3) .ip-card-wrapper { animation-delay: 0.09s; }
+    .ip-grid > div:nth-child(4) .ip-card-wrapper { animation-delay: 0.12s; }
+    .ip-grid > div:nth-child(5) .ip-card-wrapper { animation-delay: 0.15s; }
+    .ip-grid > div:nth-child(6) .ip-card-wrapper { animation-delay: 0.18s; }
+    .ip-grid > div:nth-child(7) .ip-card-wrapper { animation-delay: 0.21s; }
+    .ip-grid > div:nth-child(8) .ip-card-wrapper { animation-delay: 0.24s; }
+    .ip-grid > div:nth-child(9) .ip-card-wrapper { animation-delay: 0.27s; }
+    .ip-grid > div:nth-child(10) .ip-card-wrapper { animation-delay: 0.30s; }
+    .ip-grid > div:nth-child(11) .ip-card-wrapper { animation-delay: 0.33s; }
+    .ip-grid > div:nth-child(12) .ip-card-wrapper { animation-delay: 0.36s; }
+
+    /* PHOTO CONTAINER WITH SHIMMER SWEEP */
+    .ip-photo-box {
         position: relative;
+        aspect-ratio: 20 / 19;
+        width: 100%;
         border-radius: var(--ip-radius);
         overflow: hidden;
-        box-shadow: var(--ip-shadow);
-        transition: box-shadow 0.2s ease, transform 0.2s ease;
+        background: #000;
+        box-shadow: var(--ip-shadow-sm);
+        margin-bottom: 0.65rem;
+        transition: box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s ease;
     }
-
-    .ip-card:hover .ip-img-wrap {
-        box-shadow: var(--ip-shadow-hover);
-        transform: translateY(-3px);
-    }
-
-    .ip-img {
-        width: 100%;
-        height: 220px;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.3s ease;
-    }
-
-    .ip-card:hover .ip-img {
-        transform: scale(1.04);
-    }
-
-    .ip-img-overlay {
+    .ip-photo-box::before {
+        content: "";
         position: absolute;
-        inset: 0;
-        background-color: rgba(0,0,0,0);
-        transition: background-color 0.2s ease;
-    }
-
-    .ip-card:hover .ip-img-overlay {
-        background-color: rgba(0,0,0,0.06);
-    }
-
-    .ip-body {
-        padding-top: 0.6rem;
-    }
-
-    .ip-title {
-        font-weight: 700;
-        color: var(--ip-text);
-        margin-bottom: 0.15rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .ip-location {
-        color: var(--ip-muted);
-        font-size: 0.85rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .ip-price {
-        color: var(--ip-text);
-        font-weight: 600;
-        margin-bottom: 0.75rem;
-    }
-
-    .ip-book-btn {
-        display: block;
-        text-align: center;
-        width: 100%;
-        background-color: var(--ip-brand);
-        color: #fff;
-        border: none;
-        border-radius: 999px;
-        font-weight: 600;
-        padding: 0.5rem 0;
-        text-decoration: none;
-        transition: background-color 0.15s ease, transform 0.1s ease;
-    }
-
-    .ip-book-btn:hover {
-        background-color: var(--ip-brand-dark);
-        color: #fff;
-        transform: translateY(-1px);
-    }
-
-    .ip-empty {
-        text-align: center;
-        padding: 4rem 1rem;
-        color: var(--ip-muted);
-    }
-
-    .ip-empty i {
-        font-size: 2.5rem;
-        color: var(--ip-brand);
-        margin-bottom: 1rem;
-        display: block;
-    }
-
-    .ip-pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-        margin: 2.5rem 0;
-    }
-
-    .ip-page-btn {
-        border: 1.5px solid var(--ip-brand);
-        color: var(--ip-brand);
-        background: transparent;
-        border-radius: 999px;
-        padding: 0.5rem 1.3rem;
-        font-weight: 600;
-        text-decoration: none;
-        transition: background-color 0.15s ease, color 0.15s ease;
-    }
-
-    .ip-page-btn:hover {
-        background-color: var(--ip-brand);
-        color: #fff;
-    }
-
-    .ip-page-btn.disabled {
-        opacity: 0.4;
+        top: 0;
+        left: 0;
+        width: 60%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+        transform: translateX(-150%) skewX(-25deg);
+        z-index: 3;
         pointer-events: none;
     }
-
-    .ip-page-info {
-        color: var(--ip-muted);
-        font-size: 0.9rem;
+    .ip-card-wrapper:hover .ip-photo-box::before {
+        animation: cardShimmerSweep 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ip-card-wrapper:hover .ip-photo-box {
+        box-shadow: 0 20px 38px -6px rgba(15, 23, 42, 0.16), 0 8px 16px -4px rgba(15, 23, 42, 0.08);
+    }
+    [data-bs-theme="dark"] .ip-card-wrapper:hover .ip-photo-box,
+    [data-theme="dark"] .ip-card-wrapper:hover .ip-photo-box {
+        box-shadow: 0 20px 42px -6px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(254, 66, 77, 0.3);
+    }
+    .ip-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ip-card-wrapper:hover .ip-photo {
+        transform: scale(1.07);
     }
 
-    @media (max-width: 575.98px) {
-        .ip-grid {
-            grid-template-columns: 1fr;
+    /* PHOTO OVERLAY BADGES */
+    .ip-badge-top-left {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 4;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(6px);
+        color: #111;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+    }
+    .ip-card-wrapper:hover .ip-badge-top-left {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+    }
+    [data-bs-theme="dark"] .ip-badge-top-left,
+    [data-theme="dark"] .ip-badge-top-left {
+        background: rgba(22, 25, 34, 0.94);
+        color: #f3f4f6;
+    }
+
+    /* FLOATING WISHLIST HEART */
+    .wishlist-heart-btn {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(6px);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+                    background-color 0.15s ease,
+                    box-shadow 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .wishlist-heart-btn:hover {
+        transform: scale(1.18);
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .wishlist-heart-btn:active {
+        transform: scale(0.9);
+    }
+    .wishlist-heart-btn i {
+        font-size: 1.05rem;
+        color: #222222;
+        transition: color 0.15s ease;
+    }
+    .wishlist-heart-btn.active i {
+        color: #fe424d !important;
+    }
+    [data-bs-theme="dark"] .wishlist-heart-btn,
+    [data-theme="dark"] .wishlist-heart-btn {
+        background: rgba(26, 29, 38, 0.9);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    [data-bs-theme="dark"] .wishlist-heart-btn i,
+    [data-theme="dark"] .wishlist-heart-btn i {
+        color: #f3f4f6;
+    }
+
+    /* CARD DETAILS TYPOGRAPHY */
+    .ip-card-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+    .ip-card-row-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 0.5rem;
+    }
+    .ip-card-title {
+        font-size: 0.98rem;
+        font-weight: 700;
+        color: var(--ip-text);
+        margin-bottom: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .ip-card-rating {
+        font-size: 0.88rem;
+        font-weight: 600;
+        color: var(--ip-text);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        white-space: nowrap;
+    }
+    .ip-card-rating i {
+        color: #f59e0b;
+        font-size: 0.8rem;
+    }
+    .ip-card-location {
+        font-size: 0.85rem;
+        color: var(--ip-muted);
+        margin-bottom: 0;
+    }
+    .ip-card-specs {
+        font-size: 0.8rem;
+        color: var(--ip-muted);
+        margin-bottom: 0.25rem;
+    }
+    .ip-card-price-row {
+        font-size: 0.95rem;
+        color: var(--ip-text);
+        margin-top: 0.2rem;
+    }
+    .ip-card-price-row strong {
+        font-weight: 800;
+        font-size: 1.05rem;
+    }
+    .ip-tax-badge-pill {
+        display: none;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        margin-left: 0.25rem;
+    }
+
+    /* WHY STAYHUB TRUST SECTION */
+    .ip-trust-section {
+        background: var(--ip-bg-subtle);
+        border: 1px solid var(--ip-border);
+        border-radius: var(--ip-radius-xl);
+        padding: 2.5rem 2rem;
+        margin: 3.5rem 0 2rem 0;
+    }
+    .ip-trust-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+        border-radius: var(--ip-radius);
+        background: var(--ip-bg-card, #ffffff);
+        border: 1px solid var(--ip-border);
+        box-shadow: var(--ip-shadow-xs);
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                    box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 0.2s ease;
+        animation: cardRevealUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .ip-trust-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--ip-shadow-md);
+        border-color: var(--ip-brand);
+    }
+    .ip-trust-card:hover .ip-trust-icon {
+        animation: iconWiggle 0.45s ease;
+        background: var(--ip-brand);
+        color: #ffffff;
+    }
+    .ip-trust-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: var(--ip-brand-soft);
+        color: var(--ip-brand);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        flex-shrink: 0;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, color 0.2s ease;
+    }
+    .ip-trust-card h6 {
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        color: var(--ip-text);
+    }
+    .ip-trust-card p {
+        font-size: 0.83rem;
+        color: var(--ip-muted);
+        margin-bottom: 0;
+        line-height: 1.45;
+    }
+
+    /* MAP PRICE MARKER */
+    .map-price-marker {
+        background: #ffffff;
+        color: #222222;
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+        cursor: pointer;
+        transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease;
+        border: 1px solid rgba(0,0,0,0.1);
+        white-space: nowrap;
+    }
+    .map-price-marker:hover {
+        background: #222222;
+        color: #ffffff;
+        transform: scale(1.12);
+    }
+
+    /* FLOATING MAP TOGGLE */
+    .ip-floating-map-btn {
+        position: sticky;
+        bottom: 1.5rem;
+        z-index: 80;
+        display: flex;
+        justify-content: center;
+        pointer-events: none;
+    }
+    .ip-floating-map-btn button {
+        pointer-events: auto;
+        background: #222222;
+        color: #ffffff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.75rem 1.6rem;
+        font-weight: 700;
+        font-size: 0.92rem;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    .ip-floating-map-btn button:hover {
+        background: #000000;
+        transform: scale(1.05);
+    }
+    [data-bs-theme="dark"] .ip-floating-map-btn button,
+    [data-theme="dark"] .ip-floating-map-btn button {
+        background: #fe424d;
+        color: #fff;
+    }
+
+    @media (max-width: 767.98px) {
+        .ip-cat-arrow {
+            display: none;
         }
-        .ip-tax-toggle {
-            margin-left: 0;
-            width: 100%;
+        .ip-toolbar {
+            flex-direction: column;
+            align-items: stretch;
         }
     }
 </style>
 
-<div id="filters">
+<div class="container py-2">
 
-  <a href="/listings?category=trending" class="ip-filter <%= category === 'trending' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-fire"></i></div>
-    <p>Trending</p>
-  </a>
 
-  <a href="/listings?category=rooms" class="ip-filter <%= category === 'rooms' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-bed"></i></div>
-    <p>Rooms</p>
-  </a>
 
-  <a href="/listings?category=iconic" class="ip-filter <%= category === 'iconic' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-mountain-city"></i></div>
-    <p>Iconic Cities</p>
-  </a>
-
-  <a href="/listings?category=mountains" class="ip-filter <%= category === 'mountains' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-mountain"></i></div>
-    <p>Mountains</p>
-  </a>
-
-  <a href="/listings?category=castles" class="ip-filter <%= category === 'castles' ? 'active' : '' %>">
-    <div><i class="fa-brands fa-fort-awesome"></i></div>
-    <p>Castles</p>
-  </a>
-
-  <a href="/listings?category=pools" class="ip-filter <%= category === 'pools' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-person-swimming"></i></div>
-    <p>Amazing Pools</p>
-  </a>
-
-  <a href="/listings?category=camping" class="ip-filter <%= category === 'camping' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-campground"></i></div>
-    <p>Camping</p>
-  </a>
-
-  <a href="/listings?category=farms" class="ip-filter <%= category === 'farms' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-tractor"></i></div>
-    <p>Farms</p>
-  </a>
-
-  <a href="/listings?category=arctic" class="ip-filter <%= category === 'arctic' ? 'active' : '' %>">
-    <div><i class="fa-regular fa-snowflake"></i></div>
-    <p>Arctic</p>
-  </a>
-
-  <a href="/listings?category=domes" class="ip-filter <%= category === 'domes' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-igloo"></i></div>
-    <p>Domes</p>
-  </a>
-
-  <a href="/listings?category=boats" class="ip-filter <%= category === 'boats' ? 'active' : '' %>">
-    <div><i class="fa-solid fa-sailboat"></i></div>
-    <p>Boats</p>
-  </a>
-
-  <% if (category) { %>
-  <a href="/listings" class="ip-filter">
-    <div><i class="fa-solid fa-xmark"></i></div>
-    <p>Clear</p>
-  </a>
-  <% } %>
-
-  <div class="ip-tax-toggle">
-    <div class="form-check-reverse form-switch mb-0">
-      <input class="form-check-input" type="checkbox" role="switch" id="switchCheckDefault">
-      <label class="form-check-label" for="switchCheckDefault">
-        Display total after taxes
-      </label>
-    </div>
-  </div>
-</div>
-
-<% if (allListings.length === 0) { %>
-  <div class="ip-empty">
-    <i class="fa-solid fa-house-circle-xmark"></i>
-    <h5>No listings found</h5>
-    <p>Try a different search term or category.</p>
-    <a href="/listings" class="ip-page-btn">View all listings</a>
-  </div>
-<% } else { %>
-
-<div class="ip-grid">
-
-<% for (let listing of allListings) { %>
-
-  <div>
-    <a href="/listings/<%= listing._id %>" class="ip-card">
-      <div class="ip-img-wrap">
-        <img
-          src="<%= listing.image.url %>"
-          class="ip-img"
-          alt="listing_image"
-        />
-        <div class="ip-img-overlay"></div>
-      </div>
-
-      <div class="ip-body">
-        <h6 class="ip-title"><%= listing.title %></h6>
-        <p class="ip-location"><%= listing.location %>, <%= listing.country %></p>
-        <p class="ip-price">
-          &#8377; <%= listing.price.toLocaleString("en-IN") %> / night
-          <i class="ip-tax-info">&nbsp;+18% GST</i>
-        </p>
-      </div>
-    </a>
-
-    <% if (currUser) { %>
-      <a href="/listings/<%= listing._id %>#booking" class="ip-book-btn">Book Now</a>
-    <% } else { %>
-      <a href="/login?redirect=/listings/<%= listing._id %>" class="ip-book-btn">Book Now</a>
-    <% } %>
-  </div>
-
-<% } %>
-
-</div>
-
-<% if (totalPages > 1) { %>
-<div class="ip-pagination">
-  <a
-    href="/listings?page=<%= currentPage - 1 %><%= category ? '&category=' + category : '' %><%= search ? '&search=' + search : '' %>"
-    class="ip-page-btn <%= currentPage <= 1 ? 'disabled' : '' %>"
-  >&larr; Previous</a>
-
-  <span class="ip-page-info">Page <%= currentPage %> of <%= totalPages %></span>
-
-  <a
-    href="/listings?page=<%= currentPage + 1 %><%= category ? '&category=' + category : '' %><%= search ? '&search=' + search : '' %>"
-    class="ip-page-btn <%= currentPage >= totalPages ? 'disabled' : '' %>"
-  >Next &rarr;</a>
-</div>
-<% } %>
-
-<% } %>
-
-<script>
-    let taxSwitch = document.getElementById("switchCheckDefault");
-    taxSwitch.addEventListener("click", () => {
-        let taxInfo = document.getElementsByClassName("ip-tax-info");
-        for (info of taxInfo) {
-            if (info.style.display != "inline") {
-                info.style.display = "inline";
-            } else {
-                info.style.display = "none";
-            }
+    <%
+        function buildCategoryUrl(catSlug) {
+            let params = [];
+            if (catSlug) params.push(`category=${catSlug}`);
+            if (search) params.push(`search=${encodeURIComponent(search)}`);
+            if (sort) params.push(`sort=${encodeURIComponent(sort)}`);
+            if (minPrice) params.push(`minPrice=${minPrice}`);
+            if (maxPrice) params.push(`maxPrice=${maxPrice}`);
+            return '/listings' + (params.length ? '?' + params.join('&') : '');
         }
-    });
+    %>
+
+    <!-- 2. SMOOTH HORIZONTAL CATEGORY BAR WITH ARROWS -->
+    <div class="ip-cat-container">
+        <button type="button" class="ip-cat-arrow left" id="catScrollLeft" aria-label="Scroll left">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <div class="ip-cat-scroll" id="catScrollBox">
+            <a href="<%= buildCategoryUrl('trending') %>" class="ip-cat-item <%= category === 'trending' ? 'active' : '' %>">
+                <i class="fa-solid fa-fire"></i>
+                <span>Trending</span>
+            </a>
+            <a href="<%= buildCategoryUrl('rooms') %>" class="ip-cat-item <%= category === 'rooms' ? 'active' : '' %>">
+                <i class="fa-solid fa-bed"></i>
+                <span>Rooms</span>
+            </a>
+            <a href="<%= buildCategoryUrl('iconic') %>" class="ip-cat-item <%= category === 'iconic' ? 'active' : '' %>">
+                <i class="fa-solid fa-mountain-city"></i>
+                <span>Iconic Cities</span>
+            </a>
+            <a href="<%= buildCategoryUrl('mountains') %>" class="ip-cat-item <%= category === 'mountains' ? 'active' : '' %>">
+                <i class="fa-solid fa-mountain"></i>
+                <span>Mountains</span>
+            </a>
+            <a href="<%= buildCategoryUrl('castles') %>" class="ip-cat-item <%= category === 'castles' ? 'active' : '' %>">
+                <i class="fa-brands fa-fort-awesome"></i>
+                <span>Castles</span>
+            </a>
+            <a href="<%= buildCategoryUrl('pools') %>" class="ip-cat-item <%= category === 'pools' ? 'active' : '' %>">
+                <i class="fa-solid fa-person-swimming"></i>
+                <span>Amazing Pools</span>
+            </a>
+            <a href="<%= buildCategoryUrl('camping') %>" class="ip-cat-item <%= category === 'camping' ? 'active' : '' %>">
+                <i class="fa-solid fa-campground"></i>
+                <span>Camping</span>
+            </a>
+            <a href="<%= buildCategoryUrl('farms') %>" class="ip-cat-item <%= category === 'farms' ? 'active' : '' %>">
+                <i class="fa-solid fa-tractor"></i>
+                <span>Farms</span>
+            </a>
+            <a href="<%= buildCategoryUrl('arctic') %>" class="ip-cat-item <%= category === 'arctic' ? 'active' : '' %>">
+                <i class="fa-regular fa-snowflake"></i>
+                <span>Arctic</span>
+            </a>
+            <a href="<%= buildCategoryUrl('domes') %>" class="ip-cat-item <%= category === 'domes' ? 'active' : '' %>">
+                <i class="fa-solid fa-igloo"></i>
+                <span>Domes</span>
+            </a>
+            <a href="<%= buildCategoryUrl('boats') %>" class="ip-cat-item <%= category === 'boats' ? 'active' : '' %>">
+                <i class="fa-solid fa-sailboat"></i>
+                <span>Boats</span>
+            </a>
+            <% if (category) { %>
+            <a href="<%= buildCategoryUrl(null) %>" class="ip-cat-item text-danger">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <span>Clear</span>
+            </a>
+            <% } %>
+        </div>
+
+        <button type="button" class="ip-cat-arrow right" id="catScrollRight" aria-label="Scroll right">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- 3. TOOLBAR: SORT, BUDGET & REAL TAX TOGGLE -->
+    <div class="ip-toolbar">
+        <!-- FILTER FORM -->
+        <form method="GET" action="/listings" class="d-flex flex-wrap align-items-center gap-2 mb-0">
+            <% if (category) { %><input type="hidden" name="category" value="<%= category %>"><% } %>
+            <% if (search) { %><input type="hidden" name="search" value="<%= search %>"><% } %>
+
+            <!-- SORT -->
+            <div class="ip-pill-input">
+                <i class="fa-solid fa-arrow-down-wide-short text-muted"></i>
+                <select name="sort" class="border-0 bg-transparent py-0 ps-1 fw-semibold text-secondary" style="outline: none; cursor: pointer;" onchange="this.form.submit()">
+                    <option value="">Sort: Featured</option>
+                    <option value="price_asc" <%= sort === 'price_asc' ? 'selected' : '' %>>Price: Low to High</option>
+                    <option value="price_desc" <%= sort === 'price_desc' ? 'selected' : '' %>>Price: High to Low</option>
+                    <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest Stays</option>
+                </select>
+            </div>
+
+            <!-- PRICE RANGE -->
+            <div class="ip-pill-input">
+                <span class="text-muted fw-bold">&#8377;</span>
+                <input type="number" name="minPrice" placeholder="Min" class="border-0 bg-transparent py-0" style="width: 65px; outline: none;" value="<%= minPrice || '' %>">
+                <span class="text-muted">&ndash;</span>
+                <input type="number" name="maxPrice" placeholder="Max" class="border-0 bg-transparent py-0" style="width: 65px; outline: none;" value="<%= maxPrice || '' %>">
+                <button type="submit" class="btn btn-sm btn-brand rounded-pill py-0 px-2" style="font-size: 0.75rem; height: 22px;">Apply</button>
+            </div>
+        </form>
+
+        <!-- REAL TAX TOGGLE SWITCH (AIRBNB SIGNATURE) -->
+        <div class="ip-tax-switch-box" onclick="document.getElementById('switchCheckDefault').click()">
+            <label for="switchCheckDefault" class="d-flex align-items-center gap-2">
+                <span>Display total after taxes</span>
+                <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.7rem;">GST</span>
+            </label>
+            <div class="form-check form-switch mb-0 p-0 d-flex align-items-center">
+                <input class="form-check-input ms-0" type="checkbox" role="switch" id="switchCheckDefault" style="cursor: pointer;" onclick="event.stopPropagation()">
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIVE FILTER CHIPS (IF APPLIED) -->
+    <% if (category || search || minPrice || maxPrice || sort) { %>
+    <div class="d-flex align-items-center flex-wrap gap-2 mb-3">
+        <span class="small text-muted fw-bold"><i class="fa-solid fa-filter me-1"></i> Active Filters:</span>
+        <% if (category) { %>
+            <a href="/listings<%= search ? '?search=' + search : '' %>" class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle text-decoration-none py-1 px-3">
+                Category: <%= category %> <i class="fa-solid fa-xmark ms-1"></i>
+            </a>
+        <% } %>
+        <% if (search) { %>
+            <a href="/listings<%= category ? '?category=' + category : '' %>" class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle text-decoration-none py-1 px-3">
+                "<%= search %>" <i class="fa-solid fa-xmark ms-1"></i>
+            </a>
+        <% } %>
+        <% if (minPrice || maxPrice) { %>
+            <a href="/listings<%= category ? '?category=' + category : '' %><%= search ? '&search=' + search : '' %>" class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle text-decoration-none py-1 px-3">
+                &#8377;<%= minPrice || 0 %> - &#8377;<%= maxPrice || 'Any' %> <i class="fa-solid fa-xmark ms-1"></i>
+            </a>
+        <% } %>
+        <a href="/listings" class="btn btn-sm btn-link text-muted text-decoration-none p-0 ms-2 small fw-semibold">
+            Reset all
+        </a>
+    </div>
+    <% } %>
+
+    <!-- 4. LISTINGS GRID -->
+    <% if (allListings.length === 0) { %>
+        <div class="text-center py-5 my-4 p-4 rounded-4 border bg-body">
+            <i class="fa-solid fa-house-circle-xmark fs-1 text-danger mb-3"></i>
+            <h4 class="fw-bold">No stays found for your search</h4>
+            <p class="text-muted small mb-4" style="max-width: 480px; margin: 0 auto;">
+                Try adjusting your filters, clearing the price range, or searching for a different destination in India.
+            </p>
+            <a href="/listings" class="btn btn-brand rounded-pill px-4 py-2 fw-semibold">
+                Explore All Stays
+            </a>
+        </div>
+    <% } else { %>
+
+    <div id="listingsGridView">
+        <div class="ip-grid">
+            <% for (let listing of allListings) { %>
+                <% 
+                    const isWishlisted = typeof userWishlist !== "undefined" && userWishlist.includes(listing._id.toString());
+                    const gstRate = listing.price <= 7500 ? 0.12 : 0.18;
+                    const gstDisplay = listing.price <= 7500 ? '12%' : '18%';
+                    const priceWithGst = Math.round(listing.price * (1 + gstRate));
+                    const reviewsCount = listing.reviews ? listing.reviews.length : 0;
+                    const ratingScore = reviewsCount > 0 
+                        ? (listing.reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviewsCount).toFixed(1) 
+                        : null;
+                %>
+
+                <div class="position-relative">
+                    <!-- FLOATING WISHLIST BUTTON (AJAX) -->
+                    <button 
+                        type="button" 
+                        class="wishlist-heart-btn <%= isWishlisted ? 'active' : '' %>"
+                        data-id="<%= listing._id %>"
+                        title="<%= isWishlisted ? 'Remove from wishlist' : 'Save to wishlist' %>"
+                        onclick="handleWishlistToggle(event, '<%= listing._id %>')"
+                        aria-label="Save to Wishlist"
+                    >
+                        <i class="<%= isWishlisted ? 'fa-solid text-danger' : 'fa-regular' %> fa-heart"></i>
+                    </button>
+
+                    <!-- CARD LINK -->
+                    <a href="/listings/<%= listing._id %>" class="ip-card-wrapper">
+                        <!-- PHOTO -->
+                        <div class="ip-photo-box skeleton-box">
+                            <% if (ratingScore && Number(ratingScore) >= 4.5) { %>
+                                <span class="ip-badge-top-left">
+                                    <i class="fa-solid fa-award text-danger me-1"></i> Guest Favorite
+                                </span>
+                            <% } else if (listing.category) { %>
+                                <span class="ip-badge-top-left">
+                                    <%= listing.category.charAt(0).toUpperCase() + listing.category.slice(1) %>
+                                </span>
+                            <% } %>
+
+                            <img
+                                src="<%= listing.image.url %>"
+                                class="ip-photo"
+                                alt="<%= listing.title %>"
+                                loading="lazy"
+                                decoding="async"
+                                onload="this.parentElement.classList.remove('skeleton-box')"
+                            />
+                        </div>
+
+                        <!-- DETAILS -->
+                        <div class="ip-card-details">
+                            <div class="ip-card-row-top">
+                                <h6 class="ip-card-title"><%= listing.title %></h6>
+                                <div class="ip-card-rating">
+                                    <i class="fa-solid fa-star"></i>
+                                    <span><%= ratingScore || "New" %></span>
+                                </div>
+                            </div>
+
+                            <p class="ip-card-location">
+                                <i class="fa-solid fa-location-dot me-1 text-danger" style="font-size: 0.75rem;"></i>
+                                <%= listing.location %>, <%= listing.country %>
+                            </p>
+
+                            <p class="ip-card-specs">
+                                <%= listing.maxGuests || 4 %> guests &bull; <%= listing.category || 'Homestay' %>
+                            </p>
+
+                            <!-- PRICE DISPLAY (WITH REAL DYNAMIC GST TOGGLE) -->
+                            <div class="ip-card-price-row">
+                                <span class="base-price-display">
+                                    <strong>&#8377;<%= listing.price.toLocaleString("en-IN") %></strong>
+                                    <span class="text-muted small"> / night</span>
+                                </span>
+
+                                <span class="tax-price-display d-none">
+                                    <strong class="text-danger">&#8377;<%= priceWithGst.toLocaleString("en-IN") %></strong>
+                                    <span class="text-muted small"> / night</span>
+                                </span>
+
+                                <span class="ip-tax-badge-pill">
+                                    +<%= gstDisplay %> GST
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            <% } %>
+        </div>
+
+        <!-- PAGINATION -->
+        <% if (totalPages > 1) { %>
+        <div class="d-flex justify-content-center align-items-center gap-3 my-5">
+            <a
+                href="/listings?page=<%= currentPage - 1 %><%= category ? '&category=' + category : '' %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                class="btn btn-outline-dark rounded-pill px-4 <%= currentPage <= 1 ? 'disabled opacity-50' : '' %>"
+            >&larr; Previous</a>
+
+            <span class="text-muted fw-semibold small">Page <%= currentPage %> of <%= totalPages %></span>
+
+            <a
+                href="/listings?page=<%= currentPage + 1 %><%= category ? '&category=' + category : '' %><%= search ? '&search=' + search : '' %><%= sort ? '&sort=' + sort : '' %><%= minPrice ? '&minPrice=' + minPrice : '' %><%= maxPrice ? '&maxPrice=' + maxPrice : '' %>"
+                class="btn btn-outline-dark rounded-pill px-4 <%= currentPage >= totalPages ? 'disabled opacity-50' : '' %>"
+            >Next &rarr;</a>
+        </div>
+        <% } %>
+    </div>
+
+    <!-- 5. INTERACTIVE MAP VIEW CONTAINER -->
+    <div id="listingsMapView" class="d-none my-4 shadow-sm" style="height: 72vh; min-height: 520px; border-radius: 1.25rem; overflow: hidden; border: 1px solid var(--ip-border);">
+        <div id="mapAllListings" style="width: 100%; height: 100%;"></div>
+    </div>
+
+    <!-- 6. FLOATING AIRBNB-STYLE SHOW MAP / SHOW LIST TOGGLE -->
+    <div class="ip-floating-map-btn">
+        <button id="toggleMapBtn" type="button" aria-label="Toggle map view">
+            <i class="fa-solid fa-map" id="toggleMapIcon"></i>
+            <span id="toggleMapText">Show Map</span>
+        </button>
+    </div>
+
+    <!-- 7. WHY CHOOSE STAYHUB (TRUST & VALUE PROPOSITION) -->
+    <div class="ip-trust-section">
+        <div class="text-center mb-4">
+            <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-semibold">The StayHub Standard</span>
+            <h3 class="fw-bold mt-2">Book with Complete Peace of Mind</h3>
+            <p class="text-muted small">Hospitality, transparency, and security built into every single trip.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="ip-trust-card">
+                    <div class="ip-trust-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div>
+                        <h6>Verified Stays</h6>
+                        <p>Every home is inspected for verified amenities, cleanliness, and authentic guest reviews.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="ip-trust-card">
+                    <div class="ip-trust-icon"><i class="fa-solid fa-bolt"></i></div>
+                    <div>
+                        <h6>Instant Confirmation</h6>
+                        <p>Zero waiting time. Seamless automated bookings powered securely via Razorpay.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="ip-trust-card">
+                    <div class="ip-trust-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                    <div>
+                        <h6>GST Tax Invoices</h6>
+                        <p>Official Indian GST-compliant invoices with SAC codes generated automatically upon booking.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="ip-trust-card">
+                    <div class="ip-trust-icon"><i class="fa-solid fa-headset"></i></div>
+                    <div>
+                        <h6>24/7 Guest Care</h6>
+                        <p>Our dedicated support team is available around the clock to assist with your reservations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <% } %>
+
+</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+    const mapToken = "<%= process.env.MAP_TOKEN %>";
+    const allListingsData = <%- JSON.stringify(allListings.map(l => ({ _id: l._id, title: l.title, price: l.price, location: l.location, category: l.category, image: l.image, geometry: l.geometry }))) %>;
+
+    // 1. Horizontal Category Carousel Scrolling
+    const catBox = document.getElementById("catScrollBox");
+    const scrollLeftBtn = document.getElementById("catScrollLeft");
+    const scrollRightBtn = document.getElementById("catScrollRight");
+
+    if (catBox && scrollLeftBtn && scrollRightBtn) {
+        scrollLeftBtn.addEventListener("click", () => {
+            catBox.scrollBy({ left: -240, behavior: 'smooth' });
+        });
+        scrollRightBtn.addEventListener("click", () => {
+            catBox.scrollBy({ left: 240, behavior: 'smooth' });
+        });
+    }
+
+    // 2. Real-time Tax Toggle Switch (Dynamic Total Calculation)
+    const taxSwitch = document.getElementById("switchCheckDefault");
+    if (taxSwitch) {
+        taxSwitch.addEventListener("change", function () {
+            const isChecked = this.checked;
+            const basePrices = document.querySelectorAll(".base-price-display");
+            const taxPrices = document.querySelectorAll(".tax-price-display");
+            const taxBadges = document.querySelectorAll(".ip-tax-badge-pill");
+
+            basePrices.forEach(el => el.classList.toggle("d-none", isChecked));
+            taxPrices.forEach(el => el.classList.toggle("d-none", !isChecked));
+            taxBadges.forEach(el => el.style.display = isChecked ? "inline-block" : "none");
+        });
+    }
+
+    // 3. Wishlist AJAX Toggle
+    async function handleWishlistToggle(event, listingId) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const btn = event.currentTarget;
+        const icon = btn.querySelector("i");
+
+        try {
+            const res = await fetch(`/wishlist/${listingId}/toggle`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+            const data = await res.json();
+            
+            if (data.requireLogin) {
+                window.location.href = `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}&msg=wishlist`;
+                return;
+            }
+
+            if (data.success) {
+                btn.classList.remove("heart-pop-anim");
+                void btn.offsetWidth;
+                btn.classList.add("heart-pop-anim");
+
+                if (data.favorited) {
+                    btn.classList.add("active");
+                    icon.classList.remove("fa-regular");
+                    icon.classList.add("fa-solid", "text-danger");
+                    btn.setAttribute("title", "Remove from wishlist");
+                } else {
+                    btn.classList.remove("active");
+                    icon.classList.remove("fa-solid", "text-danger");
+                    icon.classList.add("fa-regular");
+                    btn.setAttribute("title", "Save to wishlist");
+                }
+                if (typeof updateNavWishlistBadge === "function" && typeof data.count !== "undefined") {
+                    updateNavWishlistBadge(data.count);
+                }
+                if (typeof showToast === "function") {
+                    showToast(data.message || (data.favorited ? "Saved to wishlist ❤️" : "Removed from wishlist"));
+                }
+            }
+        } catch (err) {
+            console.error("Wishlist toggle error:", err);
+        }
+    }
+
+    // 4. Map View Toggle (Mapbox GL)
+    let mapInstance = null;
+    const toggleMapBtn = document.getElementById("toggleMapBtn");
+    const gridView = document.getElementById("listingsGridView");
+    const mapView = document.getElementById("listingsMapView");
+    const toggleMapText = document.getElementById("toggleMapText");
+    const toggleMapIcon = document.getElementById("toggleMapIcon");
+
+    if (toggleMapBtn && gridView && mapView) {
+        toggleMapBtn.addEventListener("click", () => {
+            const isMapHidden = mapView.classList.contains("d-none");
+            if (isMapHidden) {
+                gridView.classList.add("d-none");
+                mapView.classList.remove("d-none");
+                toggleMapText.textContent = "Show List";
+                toggleMapIcon.classList.remove("fa-map");
+                toggleMapIcon.classList.add("fa-list-ul");
+
+                if (!mapInstance && typeof mapboxgl !== "undefined" && mapToken) {
+                    mapboxgl.accessToken = mapToken;
+                    
+                    let center = [78.9629, 20.5937]; // Center of India
+                    if (allListingsData.length > 0 && allListingsData[0].geometry && allListingsData[0].geometry.coordinates) {
+                        center = allListingsData[0].geometry.coordinates;
+                    }
+
+                    mapInstance = new mapboxgl.Map({
+                        container: 'mapAllListings',
+                        style: 'mapbox://styles/mapbox/streets-v12',
+                        center: center,
+                        zoom: 5,
+                    });
+
+                    mapInstance.addControl(new mapboxgl.NavigationControl());
+
+                    const bounds = new mapboxgl.LngLatBounds();
+                    let validCoords = 0;
+
+                    allListingsData.forEach(listing => {
+                        if (listing.geometry && listing.geometry.coordinates && listing.geometry.coordinates.length === 2) {
+                            const coords = listing.geometry.coordinates;
+                            bounds.extend(coords);
+                            validCoords++;
+
+                            const el = document.createElement('div');
+                            el.className = 'map-price-marker';
+                            el.innerHTML = `₹${listing.price.toLocaleString("en-IN")}`;
+
+                            const popupHtml = `
+                                <div style="max-width: 210px; font-family: inherit;">
+                                    <img src="${listing.image ? listing.image.url : ''}" style="width: 100%; height: 105px; object-fit: cover; border-radius: 8px; margin-bottom: 6px;">
+                                    <h6 style="margin: 0 0 3px; font-size: 0.95rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${listing.title}</h6>
+                                    <p style="margin: 0 0 6px; color: #666; font-size: 0.8rem;">${listing.location}, ${listing.country}</p>
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <b style="font-size: 0.9rem;">₹${listing.price.toLocaleString("en-IN")}</b>
+                                        <a href="/listings/${listing._id}" class="btn btn-sm btn-brand text-white" style="font-size: 0.75rem; border-radius: 999px; padding: 2px 10px; text-decoration: none;">View</a>
+                                    </div>
+                                </div>
+                            `;
+
+                            new mapboxgl.Marker(el)
+                                .setLngLat(coords)
+                                .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupHtml))
+                                .addTo(mapInstance);
+                        }
+                    });
+
+                    if (validCoords > 1) {
+                        mapInstance.fitBounds(bounds, { padding: 60, maxZoom: 13 });
+                    }
+                } else if (mapInstance) {
+                    mapInstance.resize();
+                }
+            } else {
+                mapView.classList.add("d-none");
+                gridView.classList.remove("d-none");
+                toggleMapText.textContent = "Show Map";
+                toggleMapIcon.classList.remove("fa-list-ul");
+                toggleMapIcon.classList.add("fa-map");
+            }
+        });
+    }
 </script>

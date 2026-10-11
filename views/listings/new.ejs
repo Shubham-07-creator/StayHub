@@ -1,104 +1,368 @@
 <% layout("/layouts/boilerplate") %>
-<div class="row mt-4">
-    <div class="col-12 col-md-8 offset-md-2 form-card">
-    <h3 class="mb-4">Create New Listing</h3>
-    <form
-     method="POST" 
-     action="/listings" 
-     novalidate 
-     class="needs-validation" 
-     enctype="multipart/form-data"
-     >
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-        <input 
-        name="listing[title]" 
-        placeholder="Add a catchy title" 
-        type="text" 
-        class="form-control"
-        required
-        />
-        <div class="valid-feedback">Title looks good!</div>
-        </div>
+
+<div class="row justify-content-center my-4">
+    <div class="col-12 col-lg-9 col-xl-8">
         
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea 
-            name="listing[description]" 
-            class="form-control"
-            required
-            ></textarea>
-            <div class="invalid-feedback">Please enter short description!</div>
-        </div>
-        
-         <div class="mb-3">
-            <label for="image" class="form-label">Upload Image</label>
-            <input 
-            name="listing[image]"
-            type="file" 
-            class="form-control"
-            required
-            />
-        </div>
-        
-        <div class="row">
-          <div class="mb-3">
-            <label for="price" class="form-label">Price</label>
-            <input 
-            name="listing[price]" 
-            placeholder="1200" 
-            class="form-control"
-            required
-            />
-            <div class="invalid-feedback">Enter valid price!</div>
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">
+                        <i class="fa-solid fa-shield-halved"></i> Admin Portal
+                    </span>
+                    <span class="text-muted small">New Property</span>
+                </div>
+                <h2 class="fw-bold mb-0">Add a New Listing</h2>
+            </div>
+            <a href="/listings" class="btn btn-outline-secondary rounded-pill px-3 py-1 btn-sm">
+                <i class="fa-solid fa-xmark me-1"></i> Cancel
+            </a>
         </div>
 
+        <form
+            method="POST" 
+            action="/listings" 
+            novalidate 
+            class="needs-validation" 
+            enctype="multipart/form-data"
+            id="createListingForm"
+        >
+            <!-- 1. BASIC INFORMATION -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-pen text-danger"></i> Basic Information
+                </h5>
 
-        <div class="mb-3">
-            <label for="country" class="form-label">Country</label>
-            <input 
-            name="listing[country]" 
-            placeholder="India" 
-            type="text" 
-            class="form-control"
-            required
-            />
-            <div class="invalid-feedback">Please enter country name! </div>
-          </div>
-        </div>
-        
-        
-        <div class="mb-3">
-            <label for="location" class="form-label">Location</label>
-            <input 
-            name="listing[location]" 
-            placeholder="City, Area" 
-            type="text" 
-            class="form-control"
-            required
-            />
-            <div class="invalid-feedback">Please enter location!</div>
-        </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="title" class="form-label fw-semibold small">Listing Title</label>
+                        <span class="text-muted small" id="titleCount">0 / 70</span>
+                    </div>
+                    <input 
+                        name="listing[title]" 
+                        id="title"
+                        placeholder="e.g. Luxury Beachfront Villa with Private Infinity Pool" 
+                        type="text" 
+                        class="form-control"
+                        maxlength="70"
+                        required
+                    />
+                    <div class="invalid-feedback small">Please provide an attractive title.</div>
+                </div>
 
-        <div class="mb-3">
-        <label class="form-label">Category</label>
-        <select name="listing[category]" class="form-control" required>
-          <option value="">-- Select Category --</option>
-          <option value="trending">Trending</option>
-          <option value="rooms">Rooms</option>
-          <option value="iconic">Iconic Cities</option>
-          <option value="mountains">Mountains</option>
-          <option value="castles">Castles</option>
-          <option value="pools">Amazing Pools</option>
-          <option value="camping">Camping</option>
-          <option value="farms">Farms</option>
-          <option value="arctic">Arctic</option>
-          <option value="farms">Domes</option>
-          <option value="arctic">Boats</option>
-        </select>
-        </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <label for="description" class="form-label fw-semibold small">Description</label>
+                        <span class="text-muted small" id="descCount">0 / 1000</span>
+                    </div>
+                    <textarea 
+                        name="listing[description]" 
+                        id="description"
+                        rows="4"
+                        placeholder="Describe the space, atmosphere, unique highlights, and what guests will love..." 
+                        class="form-control"
+                        maxlength="1000"
+                        required
+                    ></textarea>
+                    <div class="invalid-feedback small">Please enter a description for your stay.</div>
+                </div>
 
-        <button class="btn btn-brand mt-3">Add Listing</button>
-    </form>
+                <div class="mb-2">
+                    <label for="category" class="form-label fw-semibold small">Category</label>
+                    <select name="listing[category]" id="category" class="form-select" required>
+                        <option value="">-- Choose a Category --</option>
+                        <option value="trending">🔥 Trending</option>
+                        <option value="rooms">🛏️ Rooms</option>
+                        <option value="iconic">🏙️ Iconic Cities</option>
+                        <option value="mountains">⛰️ Mountains</option>
+                        <option value="castles">🏰 Castles</option>
+                        <option value="pools">🏊 Amazing Pools</option>
+                        <option value="camping">⛺ Camping</option>
+                        <option value="farms">🚜 Farms</option>
+                        <option value="arctic">❄️ Arctic</option>
+                        <option value="domes">🛖 Domes</option>
+                        <option value="boats">⛵ Boats</option>
+                    </select>
+                    <div class="invalid-feedback small">Please select a category.</div>
+                </div>
+            </div>
+
+            <!-- 2. PHOTO UPLOAD WITH LIVE PREVIEW -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-regular fa-image text-danger"></i> Cover Photo
+                </h5>
+
+                <div class="mb-2">
+                    <label for="image" class="form-label fw-semibold small">Upload High-Quality Image</label>
+                    <input 
+                        name="listing[image]"
+                        id="image"
+                        type="file" 
+                        accept="image/*"
+                        class="form-control"
+                        required
+                    />
+                    <div class="invalid-feedback small">A cover photo is required.</div>
+                </div>
+
+                <!-- LIVE THUMBNAIL PREVIEW -->
+                <div id="imagePreviewContainer" class="d-none mt-3">
+                    <div class="position-relative d-inline-block w-100">
+                        <img id="imagePreviewThumb" src="" alt="Preview" class="img-preview-thumb shadow-sm" style="max-height: 280px;" />
+                        <div class="d-flex justify-content-between align-items-center mt-2 px-1">
+                            <span class="badge bg-dark-subtle text-dark border small" id="imageFileInfo">Photo ready</span>
+                            <button type="button" class="btn btn-sm btn-link text-danger p-0 text-decoration-none" id="removeImageBtn">
+                                <i class="fa-solid fa-trash me-1"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. PRICING & GUESTS -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-indian-rupee-sign text-danger"></i> Pricing & Capacity
+                </h5>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label for="price" class="form-label fw-semibold small">Price per Night (₹)</label>
+                        <div class="input-group">
+                            <span class="input-group-text fw-bold">₹</span>
+                            <input 
+                                name="listing[price]" 
+                                id="price"
+                                placeholder="3500" 
+                                type="number"
+                                min="100"
+                                class="form-control"
+                                required
+                            />
+                        </div>
+                        <div class="invalid-feedback small">Please enter a valid price (min ₹100).</div>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label for="maxGuests" class="form-label fw-semibold small">Max Guests</label>
+                        <input 
+                            name="listing[maxGuests]" 
+                            id="maxGuests"
+                            type="number"
+                            min="1"
+                            max="30"
+                            value="4"
+                            class="form-control"
+                            required
+                        />
+                        <div class="invalid-feedback small">Guest capacity must be between 1 and 30.</div>
+                    </div>
+                </div>
+
+                <!-- LIVE PRICE CALCULATOR CARD -->
+                <div id="priceCalcCard" class="mt-3 p-3 rounded-3 bg-light border small">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Base Nightly Rate:</span>
+                        <b id="calcBase">₹0</b>
+                    </div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted" id="calcGstLabel">Govt. GST estimate (12%):</span>
+                        <span class="text-muted" id="calcGst">+ ₹0</span>
+                    </div>
+                    <div class="d-flex justify-content-between pt-2 border-top fw-bold text-dark">
+                        <span>Total Guest Pays / Night:</span>
+                        <span class="text-danger" id="calcTotal">₹0</span>
+                    </div>
+                    <div class="text-muted mt-1" style="font-size: 0.7rem;" id="calcGstSlabNote">
+                        <i class="fa-solid fa-circle-info me-1"></i> Govt. Norm: 12% GST on room tariffs &le; ₹7,500/night (18% for &gt; ₹7,500).
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. LOCATION DETAILS -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-danger"></i> Location Details
+                </h5>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-8">
+                        <label for="location" class="form-label fw-semibold small">City / Area</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-city input-icon"></i>
+                            <input 
+                                name="listing[location]" 
+                                id="location"
+                                placeholder="e.g. Manali, Candolim Beach, Jaipur" 
+                                type="text" 
+                                class="form-control"
+                                required
+                            />
+                        </div>
+                        <div class="invalid-feedback small">Please enter the city or location.</div>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="country" class="form-label fw-semibold small">Country</label>
+                        <div class="input-icon-wrap">
+                            <i class="fa-solid fa-earth-asia input-icon"></i>
+                            <input 
+                                name="listing[country]" 
+                                id="country"
+                                placeholder="India" 
+                                type="text" 
+                                class="form-control"
+                                value="India"
+                                required
+                            />
+                        </div>
+                        <div class="invalid-feedback small">Please enter country name.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. AMENITIES SELECTION -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-2 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-sparkles text-danger"></i> What this place offers (Amenities)
+                </h5>
+                <p class="text-muted small mb-3">Select all amenities available for guests at this stay.</p>
+
+                <div class="amenity-grid">
+                    <% const defaultAmenities = [
+                        { name: "WiFi", icon: "fa-wifi" },
+                        { name: "Air conditioning", icon: "fa-snowflake" },
+                        { name: "Kitchen", icon: "fa-kitchen-set" },
+                        { name: "Free parking", icon: "fa-square-parking" },
+                        { name: "TV", icon: "fa-tv" },
+                        { name: "Swimming pool", icon: "fa-person-swimming" },
+                        { name: "Mountain view", icon: "fa-mountain" },
+                        { name: "Pet friendly", icon: "fa-paw" },
+                        { name: "Dedicated workspace", icon: "fa-laptop" },
+                        { name: "BBQ grill", icon: "fa-fire-burner" }
+                    ]; %>
+
+                    <% defaultAmenities.forEach((item, index) => { %>
+                        <label class="amenity-checkbox-label" id="amenityLabel_<%= index %>">
+                            <input 
+                                type="checkbox" 
+                                name="listing[amenities]" 
+                                value="<%= item.name %>" 
+                                <%= index < 5 ? "checked" : "" %>
+                                onchange="toggleAmenityClass(this, 'amenityLabel_<%= index %>')"
+                            />
+                            <i class="fa-solid <%= item.icon %> text-secondary"></i>
+                            <span><%= item.name %></span>
+                        </label>
+                    <% }); %>
+                </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div class="d-flex justify-content-end gap-2 mb-5">
+                <a href="/listings" class="btn btn-outline-secondary rounded-pill px-4 py-2 fw-semibold">Cancel</a>
+                <button type="submit" class="btn btn-brand rounded-pill px-5 py-2 fw-semibold shadow-sm" id="submitListingBtn">
+                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Publish Listing
+                </button>
+            </div>
+        </form>
+
     </div>
 </div>
+
+<script>
+    // Character counters
+    const titleInput = document.getElementById("title");
+    const titleCount = document.getElementById("titleCount");
+    if (titleInput && titleCount) {
+        titleInput.addEventListener("input", () => {
+            titleCount.textContent = `${titleInput.value.length} / 70`;
+        });
+    }
+
+    const descInput = document.getElementById("description");
+    const descCount = document.getElementById("descCount");
+    if (descInput && descCount) {
+        descInput.addEventListener("input", () => {
+            descCount.textContent = `${descInput.value.length} / 1000`;
+        });
+    }
+
+    // Live Price Calculator (Real Indian Hospitality GST Slabs)
+    const priceInput = document.getElementById("price");
+    const calcBase = document.getElementById("calcBase");
+    const calcGst = document.getElementById("calcGst");
+    const calcGstLabel = document.getElementById("calcGstLabel");
+    const calcTotal = document.getElementById("calcTotal");
+
+    if (priceInput) {
+        priceInput.addEventListener("input", function() {
+            const price = parseFloat(this.value) || 0;
+            const gstRate = price <= 7500 ? 0.12 : 0.18;
+            const gstRatePercent = price <= 7500 ? 12 : 18;
+            const gst = Math.round(price * gstRate);
+            const total = price + gst;
+
+            if (calcBase) calcBase.textContent = `₹${price.toLocaleString("en-IN")}`;
+            if (calcGstLabel) calcGstLabel.textContent = `Govt. GST estimate (${gstRatePercent}%):`;
+            if (calcGst) calcGst.textContent = `+ ₹${gst.toLocaleString("en-IN")}`;
+            if (calcTotal) calcTotal.textContent = `₹${total.toLocaleString("en-IN")}`;
+        });
+    }
+
+    // Live Image Thumbnail Preview
+    const imageInput = document.getElementById("image");
+    const previewContainer = document.getElementById("imagePreviewContainer");
+    const previewThumb = document.getElementById("imagePreviewThumb");
+    const imageFileInfo = document.getElementById("imageFileInfo");
+    const removeImageBtn = document.getElementById("removeImageBtn");
+
+    if (imageInput) {
+        imageInput.addEventListener("change", function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewThumb.src = e.target.result;
+                    previewContainer.classList.remove("d-none");
+                    const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+                    imageFileInfo.textContent = `${file.name} (${sizeMb} MB)`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewContainer.classList.add("d-none");
+            }
+        });
+    }
+
+    if (removeImageBtn && imageInput) {
+        removeImageBtn.addEventListener("click", () => {
+            imageInput.value = "";
+            previewContainer.classList.add("d-none");
+            previewThumb.src = "";
+        });
+    }
+
+    // Toggle active amenity class
+    function toggleAmenityClass(checkbox, labelId) {
+        const label = document.getElementById(labelId);
+        if (checkbox.checked) {
+            label.classList.add("active");
+        } else {
+            label.classList.remove("active");
+        }
+    }
+
+    // Loading button state on submit
+    const createForm = document.getElementById("createListingForm");
+    const submitListingBtn = document.getElementById("submitListingBtn");
+    if (createForm && submitListingBtn) {
+        createForm.addEventListener("submit", function() {
+            if (this.checkValidity()) {
+                submitListingBtn.disabled = true;
+                submitListingBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Publishing...';
+            }
+        });
+    }
+</script>

@@ -41,9 +41,28 @@ const bookingSchema = new Schema({
         type: Number,
         required: true,
     },
+    gstRate: {
+        type: Number,
+        default: 12,
+    },
+    gstAmount: {
+        type: Number,
+        default: 0,
+    },
+    cgst: {
+        type: Number,
+        default: 0,
+    },
+    sgst: {
+        type: Number,
+        default: 0,
+    },
     totalPrice: {
         type: Number,
         required: true,
+    },
+    invoiceNumber: {
+        type: String,
     },
     status: {
         type: String,
@@ -57,6 +76,11 @@ const bookingSchema = new Schema({
         type: String,
     },
 }, { timestamps: true });
+
+// High-performance query indexes
+bookingSchema.index({ listing: 1, status: 1 });
+bookingSchema.index({ user: 1, createdAt: -1 });
+bookingSchema.index({ invoiceNumber: 1 });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 

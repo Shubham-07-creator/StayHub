@@ -1,48 +1,266 @@
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-  <div class="container">
-    <a class="navbar-brand" href="/listings"><img src="/images/logo.svg" width="70" height="100"/></a>
-     
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container d-flex align-items-center justify-content-between">
+    
+    <!-- LEFT: BRAND LOGO -->
+    <a class="navbar-brand d-flex align-items-center text-decoration-none py-0 me-3" href="/listings">
+      <img src="/images/logo.svg" alt="StayHub" height="36" style="width: auto; margin-right: 8px;" />
+      <span class="nav-brand-title">StayHub</span>
+    </a>
+
+    <!-- TOGGLER FOR MOBILE -->
     <button 
-    class="navbar-toggler" 
-    type="button" 
-    data-bs-toggle="collapse" 
-    data-bs-target="#navbarNavAltMarkup"  
+      class="navbar-toggler" 
+      type="button" 
+      data-bs-toggle="collapse" 
+      data-bs-target="#navCollapse" 
+      aria-controls="navCollapse" 
+      aria-expanded="false" 
+      aria-label="Toggle navigation"
     >
-      <span class="navbar-toggler-icon"></span>
+      <i class="fa-solid fa-bars fs-5"></i>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-link" href="/listings"><h2 style="color: var(--brand);"><b>StayHub</b></h2></a>
+
+    <!-- COLLAPSIBLE CONTENT -->
+    <div class="collapse navbar-collapse" id="navCollapse">
+      
+      <!-- CENTER: PILL SEARCH BAR WITH SMART AUTOCOMPLETE -->
+      <div class="mx-auto my-2 my-lg-0 nav-search-wrap-relative">
+        <form class="nav-search-bar" role="search" action="/listings" method="GET" id="globalNavSearchForm">
+          <input
+            id="navGlobalSearchInput"
+            class="nav-search-input"
+            type="search"
+            name="search"
+            placeholder="Search destinations, stays, cities..."
+            autocomplete="off"
+          />
+          <button class="nav-search-btn" type="submit" title="Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </form>
+
+        <!-- SMART AUTOCOMPLETE & DESTINATION POPOVER -->
+        <div id="searchSuggestPopover" class="search-suggest-popover">
+          <!-- TRENDING DESTINATIONS SECTION -->
+          <div id="trendingDestSection">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+              <span class="small fw-bold text-muted text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-fire text-danger me-1"></i> Popular in India
+              </span>
+              <span class="text-muted small" style="font-size: 0.7rem;">Quick Filter</span>
+            </div>
+            <div class="dest-pills-row">
+              <a href="/listings?search=Goa" class="dest-pill">🏖️ Goa</a>
+              <a href="/listings?search=Manali" class="dest-pill">🏔️ Manali</a>
+              <a href="/listings?search=Jaipur" class="dest-pill">🏰 Jaipur</a>
+              <a href="/listings?search=Kerala" class="dest-pill">🌴 Kerala</a>
+              <a href="/listings?search=Udaipur" class="dest-pill">🌊 Udaipur</a>
+              <a href="/listings?search=Rishikesh" class="dest-pill">🧘 Rishikesh</a>
+              <a href="/listings?search=Shimla" class="dest-pill">🌲 Shimla</a>
+              <a href="/listings?search=Varanasi" class="dest-pill">🕉️ Varanasi</a>
+            </div>
+          </div>
+
+          <!-- LIVE SUGGESTIONS SECTION -->
+          <div id="liveSuggestSection" class="d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <span class="small fw-bold text-muted text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-sparkles text-warning me-1"></i> Matching Stays
+              </span>
+              <span class="text-muted small" id="suggestCountText" style="font-size: 0.7rem;"></span>
+            </div>
+            <div id="suggestResultsList" class="d-flex flex-column gap-1"></div>
+          </div>
+        </div>
       </div>
 
-<div class="navbar-nav ms-auto">
-  <form class="d-flex" role="search" action="/listings" method="GET">
-
-    <input
-      class="form-control me-2 search-inp"
-      type="search"
-      name="search"
-      placeholder="Search by title or country"
-    />
-
-    <button class="btn search-btn" type="submit">
-      <i class="fa-solid fa-magnifying-glass"></i>Search
-    </button>
-
-  </form>
-</div>
-
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">StayHub your home</a>
-        <% if(!currUser) { %>
-        <a class="nav-link" href="/signup"><b>Sign Up</b></a>
-        <a class="nav-link" href="/login"><b>Log in</b></a>
-        <% } %> <%if(currUser) { %>
-        <span class="nav-link" style="opacity: 0.75;"><i class="fa-solid fa-circle-user"></i>&nbsp; <%= currUser.username %></span>
-        <a class="nav-link" href="/bookings">My Trips</a>
-        <a class="nav-link" href="/logout"><b>Log out</b></a>
+      <!-- RIGHT: ACTION CONTROLS -->
+      <div class="d-flex align-items-center justify-content-end gap-2 ms-lg-3 mt-2 mt-lg-0">
+        
+        <!-- ADMIN QUICK ACTIONS -->
+        <% if(isAdmin) { %>
+          <a href="/admin/dashboard" class="btn btn-sm btn-outline-danger rounded-pill fw-semibold px-3 py-1 d-none d-md-inline-flex align-items-center gap-1" title="Admin Dashboard">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/listings/new" class="btn btn-sm btn-brand text-white rounded-pill fw-semibold px-3 py-1 d-none d-md-inline-flex align-items-center gap-1" title="Add New Listing">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Listing</span>
+          </a>
         <% } %>
+
+        <!-- WISHLIST ICON -->
+        <a href="/wishlist" class="nav-round-icon-btn position-relative" title="My Wishlist" id="navWishlistBtn">
+          <i class="fa-solid fa-heart text-danger"></i>
+          <span 
+            id="navWishlistCount" 
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger <%= (typeof userWishlist !== 'undefined' && userWishlist && userWishlist.length > 0) ? '' : 'd-none' %>" 
+            style="font-size: 0.65rem; padding: 0.25em 0.55em;"
+          >
+            <%= (typeof userWishlist !== "undefined" && userWishlist) ? userWishlist.length : 0 %>
+          </span>
+        </a>
+
+        <!-- DARK MODE TOGGLE BUTTON -->
+        <button 
+          id="themeToggleBtn" 
+          type="button" 
+          class="nav-round-icon-btn" 
+          title="Toggle Theme" 
+          aria-label="Toggle Dark Mode"
+          onclick="toggleStayHubTheme()"
+        >
+          <i class="fa-solid fa-moon text-secondary" id="themeToggleIcon"></i>
+        </button>
+
+        <!-- USER PROFILE / ACCOUNT DROPDOWN (AIRBNB STYLE) -->
+        <div class="dropdown">
+          <button 
+            class="nav-user-dropdown-btn dropdown-toggle" 
+            type="button" 
+            id="userNavMenu" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false"
+          >
+            <i class="fa-solid fa-bars text-secondary me-1" style="font-size: 0.9rem;"></i>
+            <div class="nav-user-avatar">
+              <% if(currUser) { %>
+                <%= (currUser.username || "U").charAt(0).toUpperCase() %>
+              <% } else { %>
+                <i class="fa-solid fa-user" style="font-size: 0.8rem;"></i>
+              <% } %>
+            </div>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end shadow-lg rounded-4 py-2 mt-2" aria-labelledby="userNavMenu" style="min-width: 230px;">
+            <% if(!currUser) { %>
+              <li><a class="dropdown-item py-2 fw-bold" href="/signup"><i class="fa-solid fa-user-plus me-2 text-muted"></i> Sign up</a></li>
+              <li><a class="dropdown-item py-2" href="/login"><i class="fa-solid fa-arrow-right-to-bracket me-2 text-muted"></i> Log in</a></li>
+              <li><hr class="dropdown-divider my-2"></li>
+              <li><a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#helpModal"><i class="fa-solid fa-circle-question me-2 text-muted"></i> Help Center</a></li>
+            <% } else { %>
+              <li class="px-3 py-2 border-bottom">
+                <div class="fw-bold text-truncate"><%= currUser.username %></div>
+                <small class="text-muted d-block text-truncate"><%= currUser.email %></small>
+                <% if(isAdmin) { %>
+                  <span class="badge bg-danger mt-1" style="font-size: 0.65rem;"><i class="fa-solid fa-shield-halved"></i> Admin</span>
+                <% } %>
+              </li>
+              <li><a class="dropdown-item py-2 mt-1" href="/profile"><i class="fa-regular fa-id-badge me-2 text-muted"></i> My Profile</a></li>
+              <li><a class="dropdown-item py-2" href="/bookings"><i class="fa-solid fa-suitcase-rolling me-2 text-muted"></i> My Trips</a></li>
+              <li><a class="dropdown-item py-2" href="/wishlist"><i class="fa-regular fa-heart me-2 text-danger"></i> Wishlist</a></li>
+              
+              <% if(isAdmin) { %>
+                <li><hr class="dropdown-divider my-1"></li>
+                <li class="dropdown-header text-uppercase text-danger fw-bold small pb-1">Admin Controls</li>
+                <li><a class="dropdown-item py-2" href="/admin/dashboard"><i class="fa-solid fa-gauge-high me-2 text-danger"></i> Admin Dashboard</a></li>
+                <li><a class="dropdown-item py-2" href="/listings/new"><i class="fa-solid fa-plus me-2 text-danger"></i> Add New Listing</a></li>
+              <% } %>
+              
+              <li><hr class="dropdown-divider my-2"></li>
+              <li>
+                <a class="dropdown-item py-2 text-danger fw-semibold" href="/logout">
+                  <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Log out
+                </a>
+              </li>
+            <% } %>
+          </ul>
+        </div>
+
       </div>
+
     </div>
   </div>
 </nav>
+
+<!-- SMART SEARCH AUTOCOMPLETE SCRIPT -->
+<script>
+  (function () {
+    const searchInput = document.getElementById("navGlobalSearchInput");
+    const popover = document.getElementById("searchSuggestPopover");
+    const trendingSec = document.getElementById("trendingDestSection");
+    const liveSec = document.getElementById("liveSuggestSection");
+    const resultsList = document.getElementById("suggestResultsList");
+    const countText = document.getElementById("suggestCountText");
+
+    if (!searchInput || !popover) return;
+
+    let debounceTimer = null;
+
+    // Show popover on focus
+    searchInput.addEventListener("focus", function () {
+      popover.classList.add("active");
+      if (!this.value.trim()) {
+        trendingSec.classList.remove("d-none");
+        liveSec.classList.add("d-none");
+      }
+    });
+
+    // Close when clicking outside
+    document.addEventListener("click", function (e) {
+      if (!e.target.closest(".nav-search-wrap-relative")) {
+        popover.classList.remove("active");
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") {
+        popover.classList.remove("active");
+        searchInput.blur();
+      }
+    });
+
+    // Live search on input
+    searchInput.addEventListener("input", function () {
+      const q = this.value.trim();
+      clearTimeout(debounceTimer);
+
+      if (!q) {
+        trendingSec.classList.remove("d-none");
+        liveSec.classList.add("d-none");
+        return;
+      }
+
+      trendingSec.classList.add("d-none");
+      liveSec.classList.remove("d-none");
+      resultsList.innerHTML = '<div class="text-center py-3 text-muted small"><i class="fa-solid fa-spinner fa-spin me-2 text-danger"></i>Searching stays...</div>';
+
+      debounceTimer = setTimeout(async () => {
+        try {
+          const res = await fetch(`/listings/suggestions?q=${encodeURIComponent(q)}`);
+          const data = await res.json();
+          const items = data.suggestions || [];
+
+          if (items.length === 0) {
+            resultsList.innerHTML = `
+              <div class="text-center py-3 text-muted small">
+                <i class="fa-solid fa-house-circle-xmark fs-4 text-secondary mb-2 d-block"></i>
+                No stays found matching "${q}"
+              </div>
+            `;
+            if (countText) countText.textContent = "0 results";
+            return;
+          }
+
+          if (countText) countText.textContent = `${items.length} stay${items.length > 1 ? 's' : ''}`;
+
+          resultsList.innerHTML = items.map(item => `
+            <a href="/listings/${item._id}" class="suggest-item">
+              <img src="${item.image && item.image.url ? item.image.url : '/images/placeholder.jpg'}" alt="${item.title}" class="suggest-thumb" />
+              <div class="suggest-info">
+                <h6>${item.title}</h6>
+                <p><i class="fa-solid fa-location-dot text-danger me-1"></i>${item.location}, ${item.country}</p>
+              </div>
+              <div class="suggest-price">
+                ₹${Number(item.price).toLocaleString("en-IN")}<small class="text-muted fw-normal">/nt</small>
+              </div>
+            </a>
+          `).join("");
+        } catch (err) {
+          resultsList.innerHTML = '<div class="text-center py-2 text-danger small">Error loading suggestions.</div>';
+        }
+      }, 140);
+    });
+  })();
+</script>

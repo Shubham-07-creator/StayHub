@@ -5,24 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StayHub</title>
     <link rel="icon" type="image/svg+xml" href="/images/logo.svg"/>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous"
-    />
+
+    <!-- High-Speed Resource Hints & Preconnects -->
+    <link rel="dns-prefetch" href="https://images.unsplash.com" />
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin />
+    <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="dns-prefetch" href="https://api.mapbox.com" />
+    <link rel="preconnect" href="https://api.mapbox.com" crossorigin />
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous" />
     <link rel="stylesheet" href="/css/style.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link 
-   href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" 
-   rel="stylesheet"
-/>
-<link href="/css/rating.css" rel="stylesheet"
-/>
-<link 
-   href="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.css" 
-   rel="stylesheet"
-   />
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet" />
+    <link href="/css/rating.css" rel="stylesheet" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.18.1/mapbox-gl.js"></script>
+<script>
+    (function() {
+        const savedTheme = localStorage.getItem("stayhub_theme");
+        if (savedTheme === "dark") {
+            document.documentElement.setAttribute("data-bs-theme", "dark");
+            document.documentElement.setAttribute("data-theme", "dark");
+        }
+    })();
+</script>
 </head>
 <body>
     <%- include('../includes/navbar.ejs') %>
@@ -33,11 +44,137 @@
 
     <%- include('../includes/footer.ejs') %>
 
+    <!-- LIVE FLOATING TOAST NOTIFICATION -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+      <div id="liveToast" class="toast stayhub-toast border-0 shadow-lg rounded-4 overflow-hidden" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex align-items-center p-3">
+          <div class="toast-icon-badge me-3 flex-shrink-0" id="toastIconBadge">
+            <i class="fa-solid fa-circle-check" id="toastIcon"></i>
+          </div>
+          <div class="toast-body p-0 fw-medium flex-fill" id="toastMessage">
+            Notification
+          </div>
+          <button type="button" class="btn-close ms-2 me-0 flex-shrink-0 toast-close-btn" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GLOBAL LUXURY CONFIRMATION MODAL -->
+    <div class="modal fade stayhub-modal-backdrop" id="globalConfirmModal" tabindex="-1" aria-labelledby="confirmModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content stayhub-confirm-modal border-0 shadow-2xl rounded-4 overflow-hidden">
+          <div class="modal-body p-4 text-center">
+            <!-- Pulsing Warning/Danger Icon Badge -->
+            <div class="confirm-icon-wrapper mb-3" id="confirmModalIconWrapper">
+              <div class="confirm-icon-ripple"></div>
+              <div class="confirm-icon-inner" id="confirmModalIconInner">
+                <i class="fa-solid fa-triangle-exclamation" id="confirmModalIcon"></i>
+              </div>
+            </div>
+            <!-- Modal Title -->
+            <h5 class="fw-bold mb-2 confirm-title" id="confirmModalTitle">Are you sure?</h5>
+            <!-- Modal Explanatory Message -->
+            <p class="text-muted small mb-4 confirm-message" id="confirmModalMessage">This action cannot be undone.</p>
+            <!-- Modal Action Buttons -->
+            <div class="d-flex gap-2 justify-content-center">
+              <button type="button" class="btn btn-light rounded-pill px-4 py-2 fw-semibold flex-fill confirm-btn-cancel" data-bs-dismiss="modal" id="confirmModalCancelBtn">
+                Cancel
+              </button>
+              <button type="button" class="btn btn-danger rounded-pill px-4 py-2 fw-semibold flex-fill confirm-btn-proceed d-flex align-items-center justify-content-center gap-2" id="confirmModalProceedBtn">
+                <span class="btn-text">Confirm</span>
+                <span class="btn-spinner d-none"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script 
     src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" 
     crossorigin="anonymous"
     ></script>
-    <script src="/js/script.js"></script>
+    <script src="/js/script.js?v=2"></script>
+    <script>
+        function toggleStayHubTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute("data-bs-theme") || localStorage.getItem("stayhub_theme");
+            const isDark = currentTheme === "dark";
+            const nextTheme = isDark ? "light" : "dark";
+
+            html.setAttribute("data-bs-theme", nextTheme);
+            html.setAttribute("data-theme", nextTheme);
+            localStorage.setItem("stayhub_theme", nextTheme);
+
+            const icon = document.getElementById("themeToggleIcon");
+            if (icon) {
+                icon.classList.remove("theme-icon-rotating");
+                void icon.offsetWidth; // trigger reflow
+                icon.classList.add("theme-icon-rotating");
+            }
+            updateThemeIcon(nextTheme === "dark");
+        }
+
+        function updateThemeIcon(isDark) {
+            const icon = document.getElementById("themeToggleIcon");
+            if (!icon) return;
+            if (isDark) {
+                icon.className = "fa-solid fa-sun text-warning";
+            } else {
+                icon.className = "fa-solid fa-moon text-secondary";
+            }
+        }
+
+        function updateNavWishlistBadge(count) {
+            const badge = document.getElementById("navWishlistCount");
+            if (!badge) return;
+            badge.textContent = count;
+            if (count > 0) {
+                badge.classList.remove("d-none");
+                badge.classList.remove("badge-pop-anim");
+                void badge.offsetWidth;
+                badge.classList.add("badge-pop-anim");
+            } else {
+                badge.classList.add("d-none");
+            }
+        }
+
+        function showToast(message, type = "success") {
+            const toastEl = document.getElementById("liveToast");
+            const msgEl = document.getElementById("toastMessage");
+            const iconEl = document.getElementById("toastIcon");
+            const badgeEl = document.getElementById("toastIconBadge");
+            if (!toastEl || !msgEl || typeof bootstrap === "undefined") return;
+
+            msgEl.innerHTML = message;
+
+            // Remove existing type classes
+            toastEl.classList.remove("toast-type-success", "toast-type-danger", "toast-type-error", "toast-type-warning", "toast-type-info");
+            const normalizedType = (type === "error") ? "danger" : type;
+            toastEl.classList.add(`toast-type-${normalizedType}`);
+
+            if (iconEl && badgeEl) {
+                if (normalizedType === "danger") {
+                    iconEl.className = "fa-solid fa-circle-exclamation";
+                } else if (normalizedType === "warning") {
+                    iconEl.className = "fa-solid fa-triangle-exclamation";
+                } else if (normalizedType === "info") {
+                    iconEl.className = "fa-solid fa-circle-info";
+                } else {
+                    iconEl.className = "fa-solid fa-circle-check";
+                }
+            }
+
+            const toast = new bootstrap.Toast(toastEl, { delay: 3500 });
+            toast.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const isDark = document.documentElement.getAttribute("data-bs-theme") === "dark" ||
+                           localStorage.getItem("stayhub_theme") === "dark";
+            updateThemeIcon(isDark);
+        });
+    </script>
 </body>
 </html>
