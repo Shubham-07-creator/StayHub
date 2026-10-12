@@ -703,6 +703,30 @@
                 </div>
             </div>
 
+            <!-- VERIFIED PROPERTY & INSTANT BOOKING GUARANTEE CARD -->
+            <div class="p-3 mb-4 rounded-4 border bg-body-tertiary shadow-sm">
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-6 d-flex align-items-start gap-2">
+                        <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-shield-check"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold small text-dark">StayHub Verified Property</div>
+                            <div class="text-muted" style="font-size: 0.78rem;">Physical location, high-speed WiFi & photos verified by StayHub host team.</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 d-flex align-items-start gap-2">
+                        <div class="rounded-circle bg-warning-subtle text-warning-emphasis d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold small text-dark">Guaranteed Instant Booking</div>
+                            <div class="text-muted" style="font-size: 0.78rem;">Zero host wait time. Razorpay generates your instant confirmation & official GST invoice immediately.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="sp-divider"></div>
 
             <!-- ABOUT THE STAY / DESCRIPTION -->
@@ -1051,10 +1075,13 @@
                     <div>
                         <span class="sp-widget-price">&#8377;<%= listing.price.toLocaleString("en-IN") %></span>
                         <span class="sp-widget-price-sub">/ night</span>
-                        <div>
+                        <div class="mt-1">
                             <span class="sp-widget-gst-pill">
-                                <i class="fa-solid fa-receipt me-1"></i>+<%= listing.price <= 7500 ? '12%' : '18%' %> GST (Govt. tariff slab)
+                                <i class="fa-solid fa-receipt me-1"></i>+<%= listing.price <= 7500 ? '12%' : '18%' %> GST (Govt. slab)
                             </span>
+                        </div>
+                        <div class="text-muted small mt-1" style="font-size: 0.78rem;">
+                            Total: <strong class="text-dark">&#8377;<%= Math.round(listing.price * (1 + (listing.price <= 7500 ? 0.12 : 0.18))).toLocaleString('en-IN') %></strong> / night incl. GST
                         </div>
                     </div>
                     <div class="text-end small text-muted">
@@ -1162,13 +1189,40 @@
                 </form>
             </div>
             <% } else { %>
-            <div id="booking" class="sp-widget text-center py-4">
-                <i class="fa-solid fa-lock fs-1 text-danger mb-2"></i>
-                <h4 class="fw-bold mb-2">Sign in to Book</h4>
-                <p class="text-muted small mb-4">Please log in or create an account to view live availability and reserve this stay.</p>
-                <a href="/login?redirect=/listings/<%= listing._id %>" class="btn btn-brand w-100 py-2 rounded-pill fw-bold">
-                    Log In to Reserve
-                </a>
+            <div id="booking" class="sp-widget p-4">
+                <div class="sp-widget-header">
+                    <div>
+                        <span class="sp-widget-price">&#8377;<%= listing.price.toLocaleString("en-IN") %></span>
+                        <span class="sp-widget-price-sub">/ night</span>
+                        <div class="mt-1">
+                            <span class="sp-widget-gst-pill">
+                                <i class="fa-solid fa-receipt me-1"></i>+<%= listing.price <= 7500 ? '12%' : '18%' %> GST (Govt. slab)
+                            </span>
+                        </div>
+                        <div class="text-muted small mt-1" style="font-size: 0.78rem;">
+                            Total: <strong class="text-dark">&#8377;<%= Math.round(listing.price * (1 + (listing.price <= 7500 ? 0.12 : 0.18))).toLocaleString('en-IN') %></strong> / night incl. GST
+                        </div>
+                    </div>
+                    <div class="text-end small text-muted">
+                        <div class="fw-bold text-dark">
+                            <i class="fa-solid fa-star text-warning"></i>
+                            <span><%= avgRating || "New" %></span>
+                        </div>
+                        <span style="font-size: 0.75rem;"><%= listing.reviews.length %> reviews</span>
+                    </div>
+                </div>
+
+                <div class="text-center py-3">
+                    <i class="fa-solid fa-lock fs-2 text-danger mb-2"></i>
+                    <h5 class="fw-bold mb-1">Instant Reservation</h5>
+                    <p class="text-muted small mb-3">Sign in to check live calendar dates and instantly book this verified property.</p>
+                    <a href="/login?redirect=/listings/<%= listing._id %>" class="btn btn-brand w-100 py-3 rounded-pill fw-bold shadow-sm">
+                        <i class="fa-solid fa-bolt text-warning me-1"></i> Log In to Reserve
+                    </a>
+                    <div class="text-muted mt-2" style="font-size: 0.72rem;">
+                        <i class="fa-solid fa-shield-halved text-success me-1"></i> Official GST Invoice & Instant Confirmation Guaranteed
+                    </div>
+                </div>
             </div>
             <% } %>
         </div>

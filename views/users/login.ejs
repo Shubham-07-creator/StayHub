@@ -21,6 +21,23 @@
             <span>Continue with Google</span>
         </a>
 
+        <!-- Quick Demo Login Banner for Reviewers & Quick Testing -->
+        <div class="p-3 mb-3 rounded-4 border bg-body-tertiary shadow-sm">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="small fw-bold d-flex align-items-center gap-1">
+                    <i class="fa-solid fa-bolt text-warning"></i> Quick Demo Access
+                </span>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem;">1-Click Login</span>
+            </div>
+            <p class="text-muted small mb-2" style="font-size: 0.78rem; line-height: 1.35;">
+                Testing bookings or reviews? Click below to instantly log in as a verified guest without typing.
+            </p>
+            <button type="button" class="btn btn-outline-dark btn-sm rounded-pill py-2 fw-semibold w-100 d-flex align-items-center justify-content-center gap-2" id="demoGuestQuickBtn" onclick="fillAndSubmitDemo('priya.travels@stayhub.test', 'Guest@123')">
+                <i class="fa-solid fa-user-check text-success"></i>
+                <span>Instant Demo Guest (Priya Sharma)</span>
+            </button>
+        </div>
+
         <!-- Divider -->
         <div class="auth-divider">
             <span>or log in with email</span>
@@ -132,5 +149,23 @@
                 loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Signing in...';
             }
         });
+    }
+
+    // 1-Click Demo Guest Handler
+    function fillAndSubmitDemo(email, pwd) {
+        const emailInput = document.getElementById("email");
+        const pwdInput = document.getElementById("password");
+        const form = document.getElementById("loginForm");
+        const btn = document.getElementById("demoGuestQuickBtn");
+
+        if (emailInput && pwdInput && form) {
+            emailInput.value = email;
+            pwdInput.value = pwd;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Logging in as Demo Guest...';
+            }
+            form.submit();
+        }
     }
 </script>
