@@ -185,6 +185,16 @@
 
     if (!searchInput || !popover) return;
 
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     let debounceTimer = null;
 
     // Show popover on focus
@@ -236,7 +246,7 @@
             resultsList.innerHTML = `
               <div class="text-center py-3 text-muted small">
                 <i class="fa-solid fa-house-circle-xmark fs-4 text-secondary mb-2 d-block"></i>
-                No stays found matching "${q}"
+                No stays found matching "${escapeHtml(q)}"
               </div>
             `;
             if (countText) countText.textContent = "0 results";
@@ -247,10 +257,10 @@
 
           resultsList.innerHTML = items.map(item => `
             <a href="/listings/${item._id}" class="suggest-item">
-              <img src="${item.image && item.image.url ? item.image.url : '/images/placeholder.jpg'}" alt="${item.title}" class="suggest-thumb" />
+              <img src="${item.image && item.image.url ? item.image.url : '/images/placeholder.jpg'}" alt="${escapeHtml(item.title)}" class="suggest-thumb" />
               <div class="suggest-info">
-                <h6>${item.title}</h6>
-                <p><i class="fa-solid fa-location-dot text-danger me-1"></i>${item.location}, ${item.country}</p>
+                <h6>${escapeHtml(item.title)}</h6>
+                <p><i class="fa-solid fa-location-dot text-danger me-1"></i>${escapeHtml(item.location)}, ${escapeHtml(item.country)}</p>
               </div>
               <div class="suggest-price">
                 ₹${Number(item.price).toLocaleString("en-IN")}<small class="text-muted fw-normal">/nt</small>

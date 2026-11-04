@@ -69,6 +69,17 @@ const bookingSchema = new Schema({
         enum: ["confirmed", "cancelled"],
         default: "confirmed",
     },
+    refundStatus: {
+        type: String,
+        enum: ["none", "processed", "failed", "not_applicable"],
+        default: "none",
+    },
+    refundId: {
+        type: String,
+    },
+    refundError: {
+        type: String,
+    },
     razorpayOrderId: {
         type: String,
     },
@@ -77,10 +88,12 @@ const bookingSchema = new Schema({
     },
 }, { timestamps: true });
 
-// High-performance query indexes
-bookingSchema.index({ listing: 1, status: 1 });
+// High-performance query indexes & security uniqueness guards
+bookingSchema.index({ listing: 1, status: 1, checkIn: 1, checkOut: 1 });
 bookingSchema.index({ user: 1, createdAt: -1 });
 bookingSchema.index({ invoiceNumber: 1 });
+bookingSchema.index({ razorpayPaymentId: 1 }, { unique: true, sparse: true });
+bookingSchema.index({ razorpayOrderId: 1 }, { unique: true, sparse: true });
 
 const Booking = mongoose.model('Booking', bookingSchema);
 

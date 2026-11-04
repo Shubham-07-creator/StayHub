@@ -4,7 +4,7 @@ const User = require('../models/user.js');
 const wrapAsync = require('../utlis/wrapAsync.js');
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
-const { saveRedirectUrl, isLoggedIn } = require('../middleware.js');
+const { saveRedirectUrl, isLoggedIn, sanitizeRedirectUrl } = require('../middleware.js');
 
 const userController = require('../controllers/users.js');
 
@@ -45,7 +45,7 @@ router.get("/auth/google", (req, res, next) => {
     }
 
     if (req.query.redirect) {
-        req.session.redirectUrl = req.query.redirect;
+        req.session.redirectUrl = sanitizeRedirectUrl(req.query.redirect);
     }
     passport.authenticate("google", { scope: ["profile", "email"], prompt: "select_account" })(req, res, next);
 });
@@ -62,7 +62,7 @@ router.get("/auth/google/callback", (req, res, next) => {
         req.login(user, (loginErr) => {
             if (loginErr) return next(loginErr);
             req.flash("success", `Welcome to StayHub, ${user.username}!`);
-            const redirectUrl = req.session.redirectUrl || "/listings";
+            const redirectUrl = sanitizeRedirectUrl(req.session.redirectUrl || "/listings");
             delete req.session.redirectUrl;
             res.redirect(redirectUrl);
         });

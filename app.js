@@ -76,21 +76,56 @@ store.on("error", (err) => {
     console.log("ERROR in MONGO SESSION STORE", err);
 });
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Security: do not create empty sessions for anonymous visits
     cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
+        sameSite: "lax", // CSRF Defense: blocks cross-site cookie transmission on third-party POSTs
+        secure: isProduction, // HTTPS only in production environments
     },
 };
 
-
 app.use(session(sessionOptions));
 app.use(flash());
+
+// Anti-CSRF Origin/Referer verification guard for all state-changing mutations
+app.use((req, res, next) => {
+    const safeMethods = ["GET", "HEAD", "OPTIONS"];
+    if (safeMethods.includes(req.method)) {
+        return next();
+    }
+    const origin = req.get("origin");
+    const referer = req.get("referer");
+    const host = req.get("host");
+
+    if (origin) {
+        try {
+            const originUrl = new URL(origin);
+            if (originUrl.host !== host) {
+                return res.status(403).send("Cross-Site Request Forgery blocked: Origin mismatch.");
+            }
+        } catch (e) {
+            return res.status(403).send("Cross-Site Request Forgery blocked: Malformed Origin.");
+        }
+    } else if (referer) {
+        try {
+            const refererUrl = new URL(referer);
+            if (refererUrl.host !== host) {
+                return res.status(403).send("Cross-Site Request Forgery blocked: Referer mismatch.");
+            }
+        } catch (e) {
+            return res.status(403).send("Cross-Site Request Forgery blocked: Malformed Referer.");
+        }
+    }
+    next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());

@@ -4,6 +4,18 @@ const Booking = require("./models/booking");
 const ExpressError = require("./utlis/ExpressError");
 const { listingSchema, reviewSchema, bookingSchema } = require("./schema.js");
 
+function sanitizeRedirectUrl(url, fallback = "/listings") {
+    if (!url || typeof url !== "string") return fallback;
+    const trimmed = url.trim();
+    // Prevent open redirect: must start with / and must not start with // (protocol relative) or contain backslashes
+    if (trimmed.startsWith("/") && !trimmed.startsWith("//") && !trimmed.includes("\\")) {
+        return trimmed;
+    }
+    return fallback;
+}
+
+module.exports.sanitizeRedirectUrl = sanitizeRedirectUrl;
+
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
         const isApiOrAjax = req.xhr || 
@@ -19,7 +31,7 @@ module.exports.isLoggedIn = (req, res, next) => {
             });
         }
 
-        req.session.redirectUrl = req.originalUrl;
+        req.session.redirectUrl = sanitizeRedirectUrl(req.originalUrl);
         req.flash("error", "You must be logged in to access that page");
         return res.redirect("/login");
     }
@@ -28,7 +40,7 @@ module.exports.isLoggedIn = (req, res, next) => {
 
 module.exports.saveRedirectUrl = (req, res, next) => {
     if (req.session.redirectUrl) {
-        res.locals.redirectUrl = req.session.redirectUrl;   
+        res.locals.redirectUrl = sanitizeRedirectUrl(req.session.redirectUrl);   
     }
     next();
 };

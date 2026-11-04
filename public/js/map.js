@@ -1,6 +1,16 @@
 (function () {
     "use strict";
 
+    function escapeHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
     function initMap() {
         const mapContainer = document.getElementById("map");
         if (!mapContainer) return;
@@ -91,9 +101,9 @@
                 `;
 
                 // Interactive Popup
-                const title = (typeof listing !== "undefined" && listing.title) ? listing.title : "StayHub Stay";
-                const location = (typeof listing !== "undefined" && listing.location) ? listing.location : "";
-                const country = (typeof listing !== "undefined" && listing.country) ? listing.country : "";
+                const title = (typeof listing !== "undefined" && listing.title) ? escapeHtml(listing.title) : "StayHub Stay";
+                const location = (typeof listing !== "undefined" && listing.location) ? escapeHtml(listing.location) : "";
+                const country = (typeof listing !== "undefined" && listing.country) ? escapeHtml(listing.country) : "";
 
                 const popup = new mapboxgl.Popup({ offset: 25, closeButton: true })
                     .setHTML(`

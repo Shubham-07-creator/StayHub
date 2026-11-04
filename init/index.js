@@ -1,29 +1,50 @@
+require('dotenv').config({ path: '../.env' });
 const mongoose = require('mongoose');
 const initData = require('./data.js');
 const Listing = require('../models/listing.js');    
+const User = require('../models/user.js');
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/StayHub";
-
-main()
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
-  .catch((err) => {
-    console.log(err);
-});
+const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/StayHub";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "shubhamkumar979883@gmail.com";
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(dbUrl);
+    console.log("Connected to MongoDB for Seeding");
 }
 
 const initDB = async () => {
-    await Listing.deleteMany({});
-    initData.data = initData.data.map((obj) => ({
-        ...obj,
-        owner: "6970b683253c5af502c1405d",
-    }));
-    await Listing.insertMany(initData.data);
-    console.log("Database initialized with sample data");
+    try {
+        await main();
+
+        // Find primary admin user to own seeded listings
+        let adminUser = await User.findOne({ email: ADMIN_EMAIL });
+        if (!adminUser) {
+            adminUser = await User.findOne({});
+        }
+        const ownerId = adminUser ? adminUser._id : null;
+
+        if (!ownerId) {
+            console.error("No user found in database. Please register an admin user before seeding listings.");
+            process.exit(1);
+        }
+
+        await Listing.deleteMany({});
+        const preparedListings = initData.data.map((obj) => ({
+            ...obj,
+            owner: ownerId,
+            geometry: obj.geometry || {
+                type: "Point",
+                coordinates: [77.2090, 28.6139] // Default coordinates
+            }
+        }));
+
+        await Listing.insertMany(preparedListings);
+        console.log(`Database initialized successfully with ${preparedListings.length} listings owned by ${adminUser.username} (${adminUser.email})`);
+        process.exit(0);
+    } catch (err) {
+        console.error("Seeding error:", err);
+        process.exit(1);
+    }
 };
 
 initDB();

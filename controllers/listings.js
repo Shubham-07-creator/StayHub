@@ -1,20 +1,26 @@
 const Listing = require("../models/listing.js");
 const Booking = require("../models/booking.js");
+const ExpressError = require("../utlis/ExpressError.js");
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: mapToken });
 
+function escapeRegex(text) {
+    if (!text) return "";
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
 
 module.exports.index = async (req, res) => {
   const { search, category, minPrice, maxPrice, sort } = req.query;
   let query = {};
 
   if (search && search.trim() !== "") {
+    const safeSearch = escapeRegex(search.trim());
     query.$or = [
-      { title:    { $regex: search, $options: "i" } },
-      { country:  { $regex: search, $options: "i" } },
-      { location: { $regex: search, $options: "i" } },
-      { category: { $regex: search, $options: "i" } }
+      { title:    { $regex: safeSearch, $options: "i" } },
+      { country:  { $regex: safeSearch, $options: "i" } },
+      { location: { $regex: safeSearch, $options: "i" } },
+      { category: { $regex: safeSearch, $options: "i" } }
     ];
   }
 
@@ -67,6 +73,9 @@ module.exports.index = async (req, res) => {
 module.exports.showListing = async (req, res) => {
     let { id } = req.params;
 
+    // Privacy guard: Only populate phone & email if logged-in user is platform admin or the host
+    const isAdminViewer = req.user && req.user.email === (process.env.ADMIN_EMAIL || "shubhamkumar979883@gmail.com");
+
     const [listing, bookings, guestBooking] = await Promise.all([
         Listing.findById(id)
             .populate({
@@ -76,7 +85,7 @@ module.exports.showListing = async (req, res) => {
                     select: "username avatar"
                 },
             })
-            .populate("owner", "username email phone"),
+            .populate("owner", isAdminViewer ? "username email phone avatar" : "username avatar"),
         Booking.find({
             listing: id,
             status: "confirmed",
@@ -99,18 +108,33 @@ module.exports.showListing = async (req, res) => {
 
 
 module.exports.createListing = async (req, res, next) => {
-    let response = await geocodingClient
-    .forwardGeocode({
-        query: req.body.listing.location,
-        limit: 1,
-    })
-    .send();
+    if (!req.body.listing) {
+        throw new ExpressError(400, "Send valid data for listing");
+    }
+
+    if (!req.file) {
+        req.flash("error", "Please upload a property photo.");
+        return res.redirect("/listings/new");
+    }
+
+    let coordinates = [77.2090, 28.6139]; // Default coordinates (New Delhi)
+    try {
+        let response = await geocodingClient
+            .forwardGeocode({
+                query: req.body.listing.location || "India",
+                limit: 1,
+            })
+            .send();
+
+        if (response.body.features && response.body.features.length > 0 && response.body.features[0].geometry) {
+            coordinates = response.body.features[0].geometry.coordinates;
+        }
+    } catch (geoErr) {
+        console.warn("Geocoding service unavailable, fallback to default coordinates:", geoErr.message);
+    }
        
     let url = req.file.path;
     let filename = req.file.filename;
-    if(!req.body.listing) {
-        throw new ExpressError(400, "send valid data for listing");
-    }
 
     if (req.body.listing.amenities && !Array.isArray(req.body.listing.amenities)) {
         req.body.listing.amenities = [req.body.listing.amenities];
@@ -119,11 +143,13 @@ module.exports.createListing = async (req, res, next) => {
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
     newListing.image = { url, filename };
-
-    newListing.geometry = response.body.features[0].geometry;
+    newListing.geometry = {
+        type: "Point",
+        coordinates
+    };
 
     let savedListing = await newListing.save();
-    console.log(savedListing);
+    console.log("Created Listing:", savedListing._id);
     req.flash("success", "New Listing created successfully");
     res.redirect("/listings");
 };
@@ -155,23 +181,28 @@ module.exports.updateListing = async (req, res) => {
         req.body.listing.amenities = [req.body.listing.amenities];
     }
 
-    // 🔥 LOCATION → NEW COORDINATES
-    let response = await geocodingClient
-        .forwardGeocode({
-            query: req.body.listing.location,
-            limit: 1,
-        })
-        .send();
+    let updateData = { ...req.body.listing };
 
-    req.body.listing.geometry =
-        response.body.features[0].geometry;
+    // Update coordinates if location changed
+    if (req.body.listing.location) {
+        try {
+            let response = await geocodingClient
+                .forwardGeocode({
+                    query: req.body.listing.location,
+                    limit: 1,
+                })
+                .send();
+
+            if (response.body.features && response.body.features.length > 0 && response.body.features[0].geometry) {
+                updateData.geometry = response.body.features[0].geometry;
+            }
+        } catch (geoErr) {
+            console.warn("Geocode update warning:", geoErr.message);
+        }
+    }
 
     // listing update
-    let listing = await Listing.findByIdAndUpdate(
-        id,
-        { ...req.body.listing },
-        { new: true }
-    );
+    let listing = await Listing.findByIdAndUpdate(id, updateData, { new: true });
 
     // image update
     if (typeof req.file !== "undefined") {
@@ -211,13 +242,13 @@ module.exports.searchSuggestions = async (req, res) => {
     if (!q || q.trim() === "") {
         return res.json({ suggestions: [] });
     }
-    const queryStr = q.trim();
+    const safeQ = escapeRegex(q.trim());
     const suggestions = await Listing.find({
         $or: [
-            { title: { $regex: queryStr, $options: "i" } },
-            { location: { $regex: queryStr, $options: "i" } },
-            { country: { $regex: queryStr, $options: "i" } },
-            { category: { $regex: queryStr, $options: "i" } },
+            { title: { $regex: safeQ, $options: "i" } },
+            { location: { $regex: safeQ, $options: "i" } },
+            { country: { $regex: safeQ, $options: "i" } },
+            { category: { $regex: safeQ, $options: "i" } },
         ]
     })
     .select("title location country price category image")

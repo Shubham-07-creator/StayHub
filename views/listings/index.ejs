@@ -964,7 +964,7 @@
 <!-- JAVASCRIPT LOGIC -->
 <script>
     const mapToken = "<%= process.env.MAP_TOKEN %>";
-    const allListingsData = <%- JSON.stringify(allListings.map(l => ({ _id: l._id, title: l.title, price: l.price, location: l.location, category: l.category, image: l.image, geometry: l.geometry }))) %>;
+    const allListingsData = <%- JSON.stringify(allListings.map(l => ({ _id: l._id, title: l.title, price: l.price, location: l.location, category: l.category, image: l.image, geometry: l.geometry }))).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') %>;
 
     // 1. Horizontal Category Carousel Scrolling
     const catBox = document.getElementById("catScrollBox");

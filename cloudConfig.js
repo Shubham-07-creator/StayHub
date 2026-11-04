@@ -11,7 +11,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'StayHub_Development',
-    allowedFormats: ['png', 'jpeg', 'jpg', "pdf", "webp"],
+    allowedFormats: ['png', 'jpeg', 'jpg', 'webp'],
   },
 });
 

@@ -1,9 +1,11 @@
+const crypto = require('crypto');
 const User = require('../models/user.js');
 const Booking = require('../models/booking.js');
 const Listing = require('../models/listing.js');
 const Review = require('../models/review.js');
 const { isRealEmailDomain } = require('../utlis/emailValidator.js');
-const { sendSignupOtpEmail } = require('../utlis/sendEmail.js');
+const { sendSignupOtpEmail, sendResetPasswordEmail } = require('../utlis/sendEmail.js');
+const { sanitizeRedirectUrl } = require('../middleware.js');
 
 module.exports.renderSignupForm = (req, res) => {
     if (req.user) {
@@ -33,8 +35,8 @@ module.exports.signup = async (req, res, next) => {
             return res.redirect("/login");
         }
 
-        // Generate 6-digit OTP code
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // Generate cryptographically secure 6-digit OTP code
+        const otp = crypto.randomInt(100000, 1000000).toString();
 
         // Save pending signup data in session
         req.session.pendingSignup = {
@@ -50,6 +52,7 @@ module.exports.signup = async (req, res, next) => {
             otp,
             otpExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
             sentAt: Date.now(),
+            attempts: 0,
         };
 
         // Send OTP via Email
@@ -100,8 +103,16 @@ module.exports.verifyOtp = async (req, res, next) => {
             return res.redirect("/verify-otp");
         }
 
+        req.session.pendingSignup.attempts = (req.session.pendingSignup.attempts || 0) + 1;
+        if (req.session.pendingSignup.attempts > 5) {
+            delete req.session.pendingSignup;
+            req.flash('error', "Too many failed attempts. Verification session expired. Please sign up again.");
+            return res.redirect("/signup");
+        }
+
         if (submittedOtp !== otp) {
-            req.flash('error', "Incorrect verification code. Please check your email and try again.");
+            const attemptsLeft = 5 - req.session.pendingSignup.attempts;
+            req.flash('error', `Incorrect verification code. ${attemptsLeft} attempt(s) remaining.`);
             return res.redirect("/verify-otp");
         }
 
@@ -159,10 +170,11 @@ module.exports.resendOtp = async (req, res) => {
             return res.redirect("/verify-otp");
         }
 
-        const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        const newOtp = crypto.randomInt(100000, 1000000).toString();
         req.session.pendingSignup.otp = newOtp;
         req.session.pendingSignup.otpExpires = now + 10 * 60 * 1000;
         req.session.pendingSignup.sentAt = now;
+        req.session.pendingSignup.attempts = 0;
 
         await sendSignupOtpEmail(
             req.session.pendingSignup.email,
@@ -181,7 +193,7 @@ module.exports.resendOtp = async (req, res) => {
 
 module.exports.renderLoginForm = (req, res) => {
     if (req.query.redirect) {
-        req.session.redirectUrl = req.query.redirect;
+        req.session.redirectUrl = sanitizeRedirectUrl(req.query.redirect);
     }
     if (req.query.msg === "wishlist") {
         req.flash("error", "Please log in to save properties to your wishlist.");
@@ -191,7 +203,8 @@ module.exports.renderLoginForm = (req, res) => {
 
 module.exports.login = async (req, res) => {
     req.flash('success', 'Welcome back to StayHub');
-    let redirectUrl = res.locals.redirectUrl || "/listings";
+    let redirectUrl = sanitizeRedirectUrl(res.locals.redirectUrl || req.session.redirectUrl || "/listings");
+    delete req.session.redirectUrl;
     res.redirect(redirectUrl);
 };
 
@@ -290,47 +303,110 @@ module.exports.updateProfile = async (req, res) => {
     }
 };
 
-// ---------------- FORGOT / RESET PASSWORD ----------------
-// ⚠️ SECURITY NOTE: This flow does NOT verify that the requester owns the
-// email address (no OTP/link is sent to prove inbox access). Anyone who
-// knows a user's email can reset that user's password. This is acceptable
-// for a demo/practice project only — do NOT use this pattern in a real
-// production app.
+// ---------------- FORGOT / RESET PASSWORD (SECURE OTP VERIFIED) ----------------
 
 module.exports.renderForgotPasswordForm = (req, res) => {
     res.render("users/forgot-password.ejs");
 };
 
 module.exports.forgotPassword = async (req, res) => {
-    const { email } = req.body;
+    const email = req.body.email ? req.body.email.trim().toLowerCase() : "";
     const user = await User.findOne({ email });
 
     if (!user) {
-        req.flash("error", "No account found with that email.");
+        req.flash("error", "No account found with that email address.");
         return res.redirect("/forgot-password");
     }
 
-    res.redirect(`/reset-password?email=${encodeURIComponent(email)}`);
+    // Generate cryptographically secure 6-digit OTP code
+    const otp = crypto.randomInt(100000, 1000000).toString();
+
+    req.session.pendingPasswordReset = {
+        email: user.email,
+        otp,
+        otpExpires: Date.now() + 10 * 60 * 1000, // 10 minutes
+        sentAt: Date.now(),
+        attempts: 0,
+    };
+
+    try {
+        await sendResetPasswordEmail(user.email, otp);
+        req.flash("success", `A 6-digit verification code has been sent to ${user.email}. Enter it below to reset your password.`);
+        res.redirect(`/reset-password?email=${encodeURIComponent(user.email)}`);
+    } catch (mailErr) {
+        console.error("Password reset email error:", mailErr);
+        delete req.session.pendingPasswordReset;
+        req.flash("error", "Could not send verification email. Please check your connection and try again.");
+        res.redirect("/forgot-password");
+    }
 };
 
 module.exports.renderResetPasswordForm = (req, res) => {
-    const email = req.query.email || "";
+    const email = req.query.email || (req.session.pendingPasswordReset && req.session.pendingPasswordReset.email) || "";
+    if (!req.session.pendingPasswordReset) {
+        req.flash("error", "Please request a password reset code first.");
+        return res.redirect("/forgot-password");
+    }
     res.render("users/reset-password.ejs", { prefillEmail: email });
 };
 
 module.exports.resetPassword = async (req, res) => {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    try {
+        if (!req.session.pendingPasswordReset) {
+            req.flash("error", "Password reset session expired. Please request a new code.");
+            return res.redirect("/forgot-password");
+        }
 
-    if (!user) {
-        req.flash("error", "No account found with that email.");
-        return res.redirect("/forgot-password");
+        const submittedOtp = (req.body.otp || "").toString().trim();
+        const { email, password } = req.body;
+        const pending = req.session.pendingPasswordReset;
+
+        if (!submittedOtp || submittedOtp.length !== 6) {
+            req.flash("error", "Please enter the valid 6-digit verification code sent to your email.");
+            return res.redirect(`/reset-password?email=${encodeURIComponent(email || pending.email)}`);
+        }
+
+        if (Date.now() > pending.otpExpires) {
+            delete req.session.pendingPasswordReset;
+            req.flash("error", "Verification code has expired. Please request a new code.");
+            return res.redirect("/forgot-password");
+        }
+
+        pending.attempts = (pending.attempts || 0) + 1;
+        if (pending.attempts > 5) {
+            delete req.session.pendingPasswordReset;
+            req.flash("error", "Too many invalid code attempts. Reset session cancelled for security.");
+            return res.redirect("/forgot-password");
+        }
+
+        if (submittedOtp !== pending.otp) {
+            const attemptsLeft = 5 - pending.attempts;
+            req.flash("error", `Incorrect verification code. ${attemptsLeft} attempt(s) remaining.`);
+            return res.redirect(`/reset-password?email=${encodeURIComponent(email || pending.email)}`);
+        }
+
+        const user = await User.findOne({ email: pending.email });
+        if (!user) {
+            delete req.session.pendingPasswordReset;
+            req.flash("error", "User account not found.");
+            return res.redirect("/forgot-password");
+        }
+
+        if (!password || password.length < 6) {
+            req.flash("error", "New password must be at least 6 characters.");
+            return res.redirect(`/reset-password?email=${encodeURIComponent(email || pending.email)}`);
+        }
+
+        // Secure password update
+        await user.setPassword(password);
+        await user.save();
+        delete req.session.pendingPasswordReset;
+
+        req.flash("success", "Password reset successfully! You can now log in with your new password.");
+        res.redirect("/login");
+    } catch (err) {
+        console.error("Reset password error:", err);
+        req.flash("error", "Failed to reset password: " + err.message);
+        res.redirect("/forgot-password");
     }
-
-    // setPassword (passport-local-mongoose v9+) is Promise-based — no callback
-    await user.setPassword(password);
-    await user.save();
-
-    req.flash("success", "Password reset successfully! You can now log in.");
-    res.redirect("/login");
 };

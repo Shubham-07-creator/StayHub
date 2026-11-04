@@ -6,7 +6,19 @@ const { isAdmin, validateListing } = require("../middleware.js");
 const listingController = require("../controllers/listings.js");
 const multer = require('multer');
 const { storage } = require('../cloudConfig.js');
-const upload = multer({ storage });
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max upload limit
+    fileFilter: (req, file, cb) => {
+        const allowedMimes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+        if (allowedMimes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error("Only image formats (.jpg, .jpeg, .png, .webp) up to 5MB are allowed."), false);
+        }
+    }
+});
 
 router
     .route("/")

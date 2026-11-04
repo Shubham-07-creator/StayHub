@@ -553,10 +553,10 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     const mapToken = "<%= process.env.MAP_TOKEN || '' %>";
-    const listing = <%- JSON.stringify(listing) %>;
-    const bookedRanges = <%- JSON.stringify(bookings || []) %>;
-    const razorpayUserName = <%- currUser ? JSON.stringify(currUser.username) : "''" %>;
-    const razorpayUserEmail = <%- currUser ? JSON.stringify(currUser.email) : "''" %>;
+    const listing = <%- JSON.stringify(listing).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') %>;
+    const bookedRanges = <%- JSON.stringify(bookings || []).replace(/</g, '\\u003c').replace(/>/g, '\\u003e') %>;
+    const razorpayUserName = <%- JSON.stringify(currUser ? currUser.username : "").replace(/</g, '\\u003c').replace(/>/g, '\\u003e') %>;
+    const razorpayUserEmail = <%- JSON.stringify(currUser ? currUser.email : "").replace(/</g, '\\u003c').replace(/>/g, '\\u003e') %>;
 </script>
 
 <div class="container py-3">

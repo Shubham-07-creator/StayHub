@@ -23,7 +23,14 @@ const razorpayInstance = new Razorpay({
  * - Total Payable = Base Stay + Platform Fee + GST
  */
 function calculatePrice(listing, checkInDate, checkOutDate) {
-    const diffTime = Math.abs(checkOutDate - checkInDate);
+    if (!(checkInDate instanceof Date) || isNaN(checkInDate.getTime()) ||
+        !(checkOutDate instanceof Date) || isNaN(checkOutDate.getTime())) {
+        throw new Error("Invalid check-in or check-out dates");
+    }
+    const diffTime = checkOutDate.getTime() - checkInDate.getTime();
+    if (diffTime <= 0) {
+        throw new Error("Check-out date must be strictly after check-in date");
+    }
     const nights = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
     const subtotal = nights * listing.price;
     const serviceFee = Math.round(subtotal * SERVICE_FEE_PERCENT);
@@ -69,8 +76,9 @@ module.exports.createOrder = async (req, res) => {
 
     const { checkIn, checkOut, guests } = req.body.booking;
 
-    if (Number(guests) > listing.maxGuests) {
-        return res.status(400).json({ error: `This listing allows a maximum of ${listing.maxGuests} guests` });
+    const guestCount = parseInt(guests, 10);
+    if (!Number.isInteger(guestCount) || guestCount < 1 || guestCount > listing.maxGuests) {
+        return res.status(400).json({ error: `Please enter a valid guest count between 1 and ${listing.maxGuests}` });
     }
 
     const checkInDate = new Date(checkIn);
@@ -82,10 +90,15 @@ module.exports.createOrder = async (req, res) => {
         return res.status(400).json({ error: "Check-in date cannot be in the past" });
     }
 
-    const priceCalc = calculatePrice(listing, checkInDate, checkOutDate);
+    if (checkOutDate <= checkInDate) {
+        return res.status(400).json({ error: "Check-out date must be strictly after check-in date" });
+    }
 
-    if (priceCalc.nights <= 0) {
-        return res.status(400).json({ error: "Check-out date must be after check-in date" });
+    let priceCalc;
+    try {
+        priceCalc = calculatePrice(listing, checkInDate, checkOutDate);
+    } catch (calcErr) {
+        return res.status(400).json({ error: calcErr.message });
     }
 
     const overlappingBooking = await Booking.findOne({
@@ -104,7 +117,15 @@ module.exports.createOrder = async (req, res) => {
         order = await razorpayInstance.orders.create({
             amount: priceCalc.totalPrice * 100, // Razorpay expects amount in paise
             currency: "INR",
-            receipt: `stayhub_${Date.now()}`,
+            receipt: `sh_${Date.now().toString().slice(-8)}_${listing._id.toString().slice(-4)}`,
+            notes: {
+                listingId: listing._id.toString(),
+                userId: req.user._id.toString(),
+                checkIn: checkInDate.toISOString(),
+                checkOut: checkOutDate.toISOString(),
+                guests: String(guestCount),
+                totalPrice: String(priceCalc.totalPrice),
+            }
         });
     } catch (rzpErr) {
         console.error("Razorpay order creation error:", rzpErr);
@@ -112,6 +133,17 @@ module.exports.createOrder = async (req, res) => {
             error: "Payment gateway error: " + (rzpErr.error?.description || rzpErr.message || "Failed to initialize payment gateway.")
         });
     }
+
+    // Bind order state in session for validation during payment verification
+    req.session.pendingOrder = {
+        orderId: order.id,
+        listingId: listing._id.toString(),
+        userId: req.user._id.toString(),
+        checkIn: checkInDate.toISOString(),
+        checkOut: checkOutDate.toISOString(),
+        guests: guestCount,
+        totalPrice: priceCalc.totalPrice,
+    };
 
     res.json({
         orderId: order.id,
@@ -140,14 +172,54 @@ module.exports.verifyPaymentAndBook = async (req, res) => {
         guests,
     } = req.body;
 
+    // 1. Signature Verification
     const generatedSignature = crypto
         .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
         .update(`${razorpay_order_id}|${razorpay_payment_id}`)
         .digest("hex");
 
     if (generatedSignature !== razorpay_signature) {
-        req.flash("error", "Payment verification failed. Please try again.");
+        req.flash("error", "Payment verification failed: Invalid cryptographic signature.");
         return res.redirect(`/listings/${id}#booking`);
+    }
+
+    // 2. Anti-Replay Check: Ensure this payment hasn't already been used for an existing booking
+    const existingPayment = await Booking.findOne({
+        $or: [
+            { razorpayPaymentId: razorpay_payment_id },
+            { razorpayOrderId: razorpay_order_id }
+        ]
+    });
+    if (existingPayment) {
+        req.flash("error", "This payment has already been credited to a confirmed booking.");
+        return res.redirect(`/bookings/${existingPayment._id}`);
+    }
+
+    // 3. Order Verification via Razorpay API (Ensures order amount & notes match)
+    let rzpOrder;
+    try {
+        rzpOrder = await razorpayInstance.orders.fetch(razorpay_order_id);
+    } catch (orderFetchErr) {
+        console.error("Razorpay order fetch error:", orderFetchErr);
+        req.flash("error", "Could not verify order with payment gateway.");
+        return res.redirect(`/listings/${id}#booking`);
+    }
+
+    if (!rzpOrder) {
+        req.flash("error", "Order not found on payment gateway.");
+        return res.redirect(`/listings/${id}#booking`);
+    }
+
+    // Verify order binding to this listing and user
+    if (rzpOrder.notes) {
+        if (rzpOrder.notes.listingId && rzpOrder.notes.listingId !== id.toString()) {
+            req.flash("error", "Payment integrity error: Order does not match this listing.");
+            return res.redirect(`/listings/${id}#booking`);
+        }
+        if (rzpOrder.notes.userId && rzpOrder.notes.userId !== req.user._id.toString()) {
+            req.flash("error", "Payment integrity error: Order does not belong to logged-in user.");
+            return res.redirect(`/listings/${id}#booking`);
+        }
     }
 
     const listing = await Listing.findById(id);
@@ -158,16 +230,19 @@ module.exports.verifyPaymentAndBook = async (req, res) => {
 
     const checkInDate = new Date(checkIn);
     const checkOutDate = new Date(checkOut);
-    const { 
-        nights, 
-        subtotal, 
-        serviceFee, 
-        gstRate, 
-        gstAmount, 
-        cgst, 
-        sgst, 
-        totalPrice 
-    } = calculatePrice(listing, checkInDate, checkOutDate);
+    let priceCalc;
+    try {
+        priceCalc = calculatePrice(listing, checkInDate, checkOutDate);
+    } catch (e) {
+        req.flash("error", "Invalid dates provided for booking.");
+        return res.redirect(`/listings/${id}#booking`);
+    }
+
+    // Verify amount matches
+    if (rzpOrder.amount !== Math.round(priceCalc.totalPrice * 100)) {
+        req.flash("error", "Payment amount does not match booking tariff.");
+        return res.redirect(`/listings/${id}#booking`);
+    }
 
     // Unique Tax Invoice serial number: SH-INV-YYYYMMDD-XXXX
     const dateStamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
@@ -179,22 +254,24 @@ module.exports.verifyPaymentAndBook = async (req, res) => {
         user: req.user._id,
         checkIn: checkInDate,
         checkOut: checkOutDate,
-        nights,
+        nights: priceCalc.nights,
         guests: Number(guests) || 1,
         pricePerNight: listing.price,
-        subtotal,
-        serviceFee,
-        gstRate,
-        gstAmount,
-        cgst,
-        sgst,
-        totalPrice,
+        subtotal: priceCalc.subtotal,
+        serviceFee: priceCalc.serviceFee,
+        gstRate: priceCalc.gstRate,
+        gstAmount: priceCalc.gstAmount,
+        cgst: priceCalc.cgst,
+        sgst: priceCalc.sgst,
+        totalPrice: priceCalc.totalPrice,
         invoiceNumber,
         razorpayOrderId: razorpay_order_id,
         razorpayPaymentId: razorpay_payment_id,
+        refundStatus: "none",
     });
 
     await booking.save();
+    delete req.session.pendingOrder;
 
     req.flash("success", "Payment successful! Your reservation is confirmed.");
     res.redirect(`/bookings/${booking._id}`);
@@ -269,21 +346,26 @@ module.exports.cancelBooking = async (req, res) => {
     // Attempt a Razorpay refund if this booking was actually paid for
     if (booking.razorpayPaymentId) {
         try {
-            await razorpayInstance.payments.refund(booking.razorpayPaymentId, {
+            const refund = await razorpayInstance.payments.refund(booking.razorpayPaymentId, {
                 amount: booking.totalPrice * 100, // full refund, in paise
                 speed: "optimum",
             });
             booking.status = "cancelled";
+            booking.refundStatus = "processed";
+            booking.refundId = refund.id;
             await booking.save();
-            req.flash("success", "Your booking has been cancelled and a refund has been initiated.");
+            req.flash("success", "Your booking has been cancelled and a full refund has been initiated.");
         } catch (refundErr) {
-            console.log("Refund failed:", refundErr.message);
-            booking.status = "cancelled";
+            console.error("Refund failed:", refundErr.message);
+            booking.refundStatus = "failed";
+            booking.refundError = refundErr.message;
+            // Record refund failure status so host/admin knows money was not refunded
             await booking.save();
-            req.flash("error", "Booking cancelled, but the automatic refund failed. Please contact support.");
+            req.flash("error", `Booking cancellation recorded, but automatic refund failed: ${refundErr.message}. Support has been notified to process manually.`);
         }
     } else {
         booking.status = "cancelled";
+        booking.refundStatus = "not_applicable";
         await booking.save();
         req.flash("success", "Your booking has been cancelled");
     }
